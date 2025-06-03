@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Name } from './name.entity';
+import { AuthModule } from './auth/auth.module';
 import typeorm from './config/typeorm';
 
 
@@ -23,7 +24,8 @@ import typeorm from './config/typeorm';
         return typeOrmConfig;
       }
     }),
-    TypeOrmModule.forFeature([Name]), // Register the Name entity
+    TypeOrmModule.forFeature([Name]),
+    AuthModule, // Register the Name entity
   ],
   controllers: [AppController],
   providers: [AppService],
