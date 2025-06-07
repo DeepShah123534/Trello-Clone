@@ -2,16 +2,18 @@ import {
   Box,
   Button,
   Input,
-  Text
+  Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import {
   FormControl,
   FormLabel,
   FormErrorMessage,
   
 } from "@chakra-ui/form-control";
+import { useNavigate } from "react-router-dom";
+
 
 const isInvalidEmail =(email:string) => {
     const emailFormat = /\S+@\S+\.\S+/;
@@ -32,6 +34,8 @@ const isInvalidPass2 = (pass1: string, pass2: string) => {
 
 
 const SignUp = () => {
+    const navigate = useNavigate();
+  
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
@@ -75,29 +79,37 @@ const SignUp = () => {
         setSecondPassword(e.target.value);
     };
 
-    const onSubmit = () => {
+    
 
+    const onSubmit = () => {
         setSubmitClickedName(true);
         setSubmitClickedEmail(true);
         setSubmitClickedUsername(true);
         setSubmitClickedPassword(true);
         setSubmitClickedSecondPassword(true);
-        
 
-        console.log("ERROR NAME", isErrorName)
-
-        if (name === "" 
-        || isInvalidEmail(email) 
-        || username === "" 
-        || password === "" 
-        || secondPassword !== password   
-        || secondPassword === "") {
+        if (
+            name === "" ||
+            isInvalidEmail(email) ||
+            username === "" ||
+            password === "" ||
+            secondPassword !== password ||
+            secondPassword === ""
+        ) {
             return;
-        }   
+        }
         else{
-        axios.post("http://localhost:3000/auth/sign-up", {name, email, username, password
-        }).then((response: any) => {
-            console.log("RESPONSE ", response);
+            axios
+            .post("http://localhost:3000/auth/sign-up", {
+            name,
+            email,
+            username,
+            password,
+            })
+            .then((response: any) => {
+            const token = response.data;
+            localStorage.setItem("token", token);
+
             setName("");
             setEmail("");
             setUsername("");
@@ -108,15 +120,22 @@ const SignUp = () => {
             setSubmitClickedUsername(false);
             setSubmitClickedPassword(false);
             setSubmitClickedSecondPassword(false);
-        });
-        }
-    };
 
+            alert("Account created successfully!");
+            navigate("/projects");
+            })
+            .catch((error) => {
+                console.error("ERROR: ", error);
+                alert("There was an error");
+            });
+        }
+        
+        };
     
     return (
         <Box>   
             <Text textAlign="center" mb={4} fontSize={20}>
-                Create an Account
+            Create an Account
             </Text>
 
             <Box
@@ -128,50 +147,52 @@ const SignUp = () => {
                 margin="0 auto"
                 gap={4}
             >
-                <FormControl isInvalid={isErrorName} isRequired>
+                <FormControl w="100%" isInvalid={isErrorName} isRequired>
                     <FormLabel>Name</FormLabel>
-                    <Input w="100%" type="text" value={name} onChange={onChangeName} />
+                    <Input type="text" value={name} onChange={onChangeName} />
                     {!isErrorName ? null : (
                         <FormErrorMessage>Name's required</FormErrorMessage>
                     )}
                 </FormControl>
 
-                <FormControl isInvalid={isErrorEmail} isRequired>
+                <FormControl w="100%" isInvalid={isErrorEmail} isRequired>
                     <FormLabel>Email</FormLabel>
-                    <Input  w="100%" type="email" value={email} onChange={onChangeEmail} />
+                    <Input type="email" value={email} onChange={onChangeEmail} />
                     {!isErrorEmail ? null : (
                         <FormErrorMessage>A valid email address is requrired</FormErrorMessage>
                     )}
                 </FormControl>
 
-                <FormControl isInvalid={isErrorUsername} isRequired>
+                <FormControl w="100%" isInvalid={isErrorUsername} isRequired>
                     <FormLabel>Username</FormLabel>
-                    <Input w="100%" type="text" value={username} onChange={onChangeUsername} />
+                    <Input type="text" value={username} onChange={onChangeUsername} />
                     {!isErrorUsername ? null : (
                         <FormErrorMessage>Username is required</FormErrorMessage>
                     )}
                 </FormControl>
 
-                <FormControl isInvalid={isErrorPassword} isRequired>
+                <FormControl w="100%" isInvalid={isErrorPassword} isRequired>
                     <FormLabel>Password</FormLabel>
-                    <Input  w="100%" type="password" value={password} onChange={onChangePassword} />
+                    <Input type="password" value={password} onChange={onChangePassword} />
                     {!isErrorPassword ? null : (
                         <FormErrorMessage>Password is required</FormErrorMessage>
                     )}
                 </FormControl>
 
-                <FormControl isInvalid={isErrorSecondPassword} isRequired>
+                <FormControl w="100%" isInvalid={isErrorSecondPassword} isRequired>
                     <FormLabel>Re-enter your Password</FormLabel>
-                    <Input  w="100%" type="password" value={secondPassword} onChange={onChangeSecondPassword} />
+                    <Input type="password" value={secondPassword} onChange={onChangeSecondPassword} />
                     {!isErrorSecondPassword ? null : (
                         <FormErrorMessage>Password didn't match</FormErrorMessage>
                     )}
                 </FormControl>
 
                 <Button w="100%" onClick={onSubmit}>Submit</Button>
+                
             </Box>
         </Box>
     );
 };
 
 export default SignUp;
+

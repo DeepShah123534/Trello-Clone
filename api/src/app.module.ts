@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Name } from './name.entity';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 import typeorm from './config/typeorm';
 
 
@@ -25,7 +26,8 @@ import typeorm from './config/typeorm';
       }
     }),
     TypeOrmModule.forFeature([Name]),
-    AuthModule, // Register the Name entity
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

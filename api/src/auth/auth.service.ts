@@ -1,8 +1,70 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class AuthService {
-  signUp(signUpDto) {
-    console.log('SIGN UP DTO:', signUpDto);
+  constructor(private usersServices: UsersService,
+    private jwtService: JwtService
+  ) {}
+
+  async hashPassword(password: string) {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+  }
+
+  async createAccessToken(user) {
+    const payload = { sub:user.userId, username: user.username };
+    return  await this.jwtService.signAsync(payload);
+  }
+
+  async signUp(signUpDto) {
+
+    const userResult = await this.usersServices.findUserByUsername(signUpDto.username);
+    const usernameExists = !!(userResult && userResult.username);
+
+
+
+    const userEmailUser = await this.usersServices.findUserByEmail(signUpDto.email);
+    const useremailExists = !!(userEmailUser && userEmailUser.email);
+
+    if (usernameExists) {
+      throw new BadRequestException('Username already exists');
+    }
+    if (useremailExists) {
+      throw new BadRequestException('Email already exists');
+    }
+
+    const hashedPassword = await this.hashPassword(signUpDto.password);
+    signUpDto.password = hashedPassword;
+    const user = await this.usersServices.createuser(signUpDto);
+
+    return await this.createAccessToken(user);
+  }
+
+  async verifyPassword(enteredPassword: string, storedPassword: string) {
+    return await bcrypt.compare(enteredPassword, storedPassword);
+  }
+
+  async logIn(logInDto) {
+// Check if the user exists
+    const user = await this.usersServices.findUserByUsername(logInDto.username);
+
+// User doesn't exist, so we throw an error
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+// verify password matches
+    const passwordsMatch = await this.verifyPassword(logInDto.password, user.password);
+
+// if password does not match, throw an error
+    if (!passwordsMatch) {
+      throw new UnauthorizedException;
+    }
+// create access token and return it
+    return await this.createAccessToken(user);
   }
 }
