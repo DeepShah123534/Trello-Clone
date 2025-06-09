@@ -1,13 +1,15 @@
+import { Context } from '@/App';
 import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/form-control';
 import { Box, Button, Input, Text } from '@chakra-ui/react';
 import axios from 'axios';
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 const  LogIn =() => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const context = useOutletContext() as Context;
     
 
     const [submitClicledUsername, setSubmitClickedUsername] = useState(false);
@@ -46,6 +48,7 @@ const  LogIn =() => {
             })
             .then((response: any) => {
             const token = response.data;
+            context.toggleLoggedIn();
             localStorage.setItem("token", token);
 
 

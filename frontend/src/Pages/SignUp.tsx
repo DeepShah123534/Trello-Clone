@@ -12,7 +12,8 @@ import {
   FormErrorMessage,
   
 } from "@chakra-ui/form-control";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Context } from "@/App";
 
 
 const isInvalidEmail =(email:string) => {
@@ -35,6 +36,7 @@ const isInvalidPass2 = (pass1: string, pass2: string) => {
 
 const SignUp = () => {
     const navigate = useNavigate();
+    const context = useOutletContext() as Context;
   
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -108,6 +110,7 @@ const SignUp = () => {
             })
             .then((response: any) => {
             const token = response.data;
+            context.toggleLoggedIn();
             localStorage.setItem("token", token);
 
             setName("");
