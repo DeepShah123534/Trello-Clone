@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { AccountDetailDto } from './auth.controller';
 
 
 @Injectable()
@@ -68,13 +69,33 @@ export class AuthService {
     return await this.createAccessToken(user);
   }
 
-  async getProfileData(username: string){
-    console.log('USERNAME:', username);
-    const user = await this.usersServices.findUserByUsername(username);
-    return {
-      email: user?.email,
-      name: user?.name,
-      username: user?.username,
-    };
+  async changeAccountDetails(accountDetailDto: AccountDetailDto) {
+    
+    const user = await this.usersServices.findUserByUsername(
+      accountDetailDto.username
+    );
+
+    if (user == null) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (accountDetailDto.field === 'password') {
+      const plainTextPassword = accountDetailDto.value;
+      const hashedPassword = await this.hashPassword(plainTextPassword);
+      user[accountDetailDto.field] = hashedPassword;
+    } else {
+      user[accountDetailDto.field] = accountDetailDto.value;
+    }
+
+    return await this.usersServices.createuser(user);
   }
+
+  async getProfileData(username: string){
+  const user = await this.usersServices.findUserByUsername(username);
+  return {
+    email: user?.email,
+    name: user?.name,
+    username: user?.username,
+  };
+}
 }

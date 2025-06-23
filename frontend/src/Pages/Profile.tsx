@@ -42,10 +42,10 @@ const Profile = () => {
 
           <Box w="100%" gap={3} display="flex" flexDirection="column">
 
-            <UserDetailsRow field="Name" value={data.name} />
-            <UserDetailsRow field="Email" value={data.email} />
-            <UserDetailsRow field="Username" value={data.username} />
-            <UserDetailsRow field="Password" value="********"/>
+            <UserDetailsRow field="Name" value={data.name} username={data.username}/>
+            <UserDetailsRow field="Email" value={data.email} username={data.username}/>
+            <UserDetailsRow field="Username" value={data.username} username={data.username} />
+            <UserDetailsRow field="Password" value="********" username={data.username} />
 
           </Box>
 
