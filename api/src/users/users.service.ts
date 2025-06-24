@@ -12,6 +12,9 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+    async findUserById(id: number) {
+        return await this.usersRepository.findOneBy({ id });
+    }
 
     async findUserByUsername(username: string) {
         return await this.usersRepository.findOneBy({ username });
@@ -25,5 +28,5 @@ export class UsersService {
         return await this.usersRepository.save( { ...user} );
     }
 
-
+    
 }

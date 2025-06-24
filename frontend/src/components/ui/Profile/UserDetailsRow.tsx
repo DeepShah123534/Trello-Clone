@@ -3,14 +3,18 @@ import { isInvalidEmail } from "../../../Pages/SignUp";
 import { Box, IconButton, Input, Text } from "@chakra-ui/react";
 import axios from "axios";
 import { JSX, useState } from "react";
+import { Data } from "../../../Pages/Profile";
+
+
 
 type Props = {
     field: string;
     value: string; 
     username: string;
+    setData: React.Dispatch<React.SetStateAction<Data>>;
 }
 
-const UserDetailsRow = ({ field, value, username }: Props): JSX.Element | null => {
+const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element | null => {
   const [updateField, setUpdateField] = useState(false);
   const [valueState, setValueState] = useState(value);
 
@@ -48,8 +52,13 @@ const UserDetailsRow = ({ field, value, username }: Props): JSX.Element | null =
       })
       .then((response) => {
         console.log("RESPONSE", response.data);
+        setData(response.data)
         alert("We've updated your account")
+      }).catch((error) => {
+        console.log('ERROR', error)
+        alert("There was an error.Please review your information and try again");
       });
+
   };
 
   return (

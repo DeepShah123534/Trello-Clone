@@ -68,8 +68,8 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(AuthGuard)
-  getProfileData(@Request() req: { user: { username: string } }) {
-    return this.authService.getProfileData(req.user.username);
+  getProfileData(@Request() req) {
+    return this.authService.getProfileData(req.user.sub);
   }
 
 }
