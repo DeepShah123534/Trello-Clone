@@ -56,7 +56,7 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
         alert("We've updated your account")
       }).catch((error) => {
         console.log('ERROR', error)
-        alert("There was an error.Please review your information and try again");
+        alert("There was an error. Please review your information and try again");
       });
 
   };
