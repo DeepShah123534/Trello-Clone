@@ -45,6 +45,12 @@ export class AccountDetailDto {
   value: string;
 };
 
+export class Email {
+  @IsEmail(undefined, {message: 'Please enter a valid email address!'})
+  @Transform((params) => sanitizeHtml(params.value))
+  email: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -70,6 +76,11 @@ export class AuthController {
   @UseGuards(AuthGuard)
   getProfileData(@Request() req) {
     return this.authService.getProfileData(req.user.sub);
+  }
+
+  @Post('reset-password')
+  sendResetPasswordEmail(@Body() email: Email){
+    console.log('EMAIL: ', email);
   }
 
 }
