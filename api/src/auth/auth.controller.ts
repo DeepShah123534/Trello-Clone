@@ -46,7 +46,7 @@ export class AccountDetailDto {
 };
 
 export class Email {
-  @IsEmail(undefined, {message: 'Please enter a valid email address!'})
+  @IsEmail(undefined, { message: 'Please enter a valid email address!' })
   @Transform((params) => sanitizeHtml(params.value))
   email: string;
 }
@@ -67,10 +67,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('change-account-detail')
-  changeAccountDetail(@Body() accountDetailDto: AccountDetailDto){
+  changeAccountDetail(@Body() accountDetailDto: AccountDetailDto) {
     return this.authService.changeAccountDetails(accountDetailDto);
   }
-
 
   @Get('profile')
   @UseGuards(AuthGuard)
@@ -79,8 +78,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  sendResetPasswordEmail(@Body() email: Email){
-    console.log('EMAIL: ', email);
+  sendResetPasswordEmail(@Body() email: Email) {
+    return this.authService.sendResetPassword(email.email);
   }
-
 }

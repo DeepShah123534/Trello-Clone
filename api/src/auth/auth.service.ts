@@ -3,12 +3,15 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AccountDetailDto } from './auth.controller';
+import { MailService } from 'src/mail/mail.service';
 
 
 @Injectable()
 export class AuthService {
-  constructor(private usersServices: UsersService,
-    private jwtService: JwtService
+  constructor(
+    private usersServices: UsersService,
+    private jwtService: JwtService,
+    private mailService: MailService
   ) {}
 
   async hashPassword(password: string) {
@@ -96,12 +99,30 @@ export class AuthService {
     }
   }
 
-  async getProfileData(id: number){
-  const user = await this.usersServices.findUserById(id);
-  return {
-    email: user?.email,
-    name: user?.name,
-    username: user?.username,
-  };
+    async getProfileData(id: number){
+    const user = await this.usersServices.findUserById(id);
+    return {
+      email: user?.email,
+      name: user?.name,
+      username: user?.username,
+    };
+  }
+
+  async sendResetPassword(email: string) {
+  const user = await this.usersServices.findUserByEmail(email);
+
+  if (!user) {
+    throw new BadRequestException('No user found with that email address');
+  }
+
+  // For now: basic token — you can later replace this with a JWT or a DB-stored token
+  const token = Math.random().toString(36).substring(2, 15);
+
+  // 📧 Send the reset email
+  await this.mailService.sendPasswordResetEmail(user, token);
+
+  return { message: 'Password reset email sent' };
 }
+
+    
 }
