@@ -109,20 +109,42 @@ export class AuthService {
   }
 
   async sendResetPassword(email: string) {
-  const user = await this.usersServices.findUserByEmail(email);
+    const user = await this.usersServices.findUserByEmail(email);
 
-  if (!user) {
-    throw new BadRequestException('No user found with that email address');
+    if (!user) {
+      throw new BadRequestException('No user found with that email address');
+    }
+
+    // For now: basic token — you can later replace this with a JWT or a DB-stored token
+    const token = await this.jwtService.signAsync(
+    { sub: user.id },
+    {
+      secret: process.env.JWT_SECRET, // must match the one used in verifyAsync
+      expiresIn: '15m', // optional
+    }
+  );
+
+    // 📧 Send the reset email
+    await this.mailService.sendPasswordResetEmail(user, token);
+
+    return { message: 'Password reset email sent' };
   }
 
-  // For now: basic token — you can later replace this with a JWT or a DB-stored token
-  const token = Math.random().toString(36).substring(2, 15);
+  async saveNewPassword(newPassword: string, id: number, token: string) {
+    const user = await this.usersServices.findUserById(id);
+    if (!user) throw new BadRequestException('User not found');
 
-  // 📧 Send the reset email
-  await this.mailService.sendPasswordResetEmail(user, token);
+   
 
-  return { message: 'Password reset email sent' };
-}
-
+    await this.jwtService.verifyAsync(token, {
+      secret: process.env.JWT_SECRET,
+    }) .catch(() => {
+      throw new UnauthorizedException('token is invalid');
+    }) .then(async () => {
+      const hashedPassword = await this.hashPassword(newPassword);
+      user.password = hashedPassword;
+      return await this.usersServices.createuser(user);
+    })
+  }
     
 }

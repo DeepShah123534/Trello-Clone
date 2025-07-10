@@ -11,6 +11,7 @@ import axios from "axios";
 // import Project from "./Pages/Project";
 import ResetPassword from "./Pages/ResetPassword";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -114,8 +115,6 @@ const router = createBrowserRouter([
        {
         path: "/reset-password/:token/:id",
         element: <ResetPassword />,
-
-
       },
 
     ],

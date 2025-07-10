@@ -1,12 +1,17 @@
 import { FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/form-control";
 import { Box, Button, Input, Text } from "@chakra-ui/react"
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { useState } from "react";
+import axios from "axios";
 
 const ResetPassword = () => {
 
   const { id, token } = useParams();
+
+  const navigate = useNavigate();
+  
+  
   const [password, setPassword] = useState("");
   const [secondPassword, setSecondPassword] = useState("");
 
@@ -34,8 +39,21 @@ const ResetPassword = () => {
         setSubmitPassword(true);
         setSubmitSecondPassword(true);
 
-        // setPassword("");
-        // setSecondPassword("");
+        axios
+        .post("http://localhost:3000/auth/save-new-password", {
+          newPassword: password,
+          id,
+          token,
+        })  
+        .then((response) => {
+        setPassword("");
+        setSecondPassword("");
+        navigate("/log-in");
+        alert("Password reset successfully. You can now log in with your new password.");
+        })
+        .catch((error) => {
+          alert("Error resetting password. Please try again.");
+        })
     }
 
 
