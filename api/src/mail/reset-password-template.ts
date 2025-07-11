@@ -3,7 +3,7 @@ export default function resetPasswordTemplate(token, id)  {
         <html> 
         
             <h1>Password Reset Email</h1>
-            <p> Click <a href="http://localhost:3001/reset-password/${token}/${id}" target="-blank" >Here </a> </p>
+            <p> To reset you password click <a href="http://localhost:3001/reset-password/${token}/${id}" target="-blank" >here </a> </p>
             
 
         <\html>

@@ -134,17 +134,20 @@ export class AuthService {
     const user = await this.usersServices.findUserById(id);
     if (!user) throw new BadRequestException('User not found');
 
-   
-
     await this.jwtService.verifyAsync(token, {
       secret: process.env.JWT_SECRET,
-    }) .catch(() => {
+    }) 
+    .catch(() => {
       throw new UnauthorizedException('token is invalid');
-    }) .then(async () => {
+    }) 
+    .then(async () => {
       const hashedPassword = await this.hashPassword(newPassword);
       user.password = hashedPassword;
       return await this.usersServices.createuser(user);
     })
   }
-    
+   
+  async deleteUser(id: number) {
+    return await this.usersServices.deleteUser(id);
+  }
 }

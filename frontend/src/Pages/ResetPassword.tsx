@@ -59,7 +59,7 @@ const ResetPassword = () => {
 
     return (
 
-            <Box position="relative">
+      <Box position="relative">
       <Text textAlign="center" mb={4} fontSize={20}>
         Reset Your Password
       </Text>

@@ -4,6 +4,7 @@ import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
 import {  Box, Text, Button, Avatar} from "@chakra-ui/react";
 import UserDetailsRow from "../components/ui/Profile/UserDetailsRow";
 import { useState } from "react";
+import axios from "axios";
 
 
 export type Data = {
@@ -28,6 +29,28 @@ const Profile = () => {
         navigate("/log-in");
         alert("You have been logged out of your account");
     }
+
+    const deleteAccount = () => {
+      const token = localStorage.getItem("token");
+      axios
+        .post(
+          "http://localhost:3000/auth/delete-user",
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((response) => {
+          localStorage.removeItem("token");
+          alert("Account deleted successfully.");
+          navigate("/sign-up");
+          console.log("RESPONSE", response.data);
+        })
+        .catch((error) => {
+          console.log('ERROR:' , error)
+          alert("Error deleting account. Please try again.");
+        })
+    };
+
+
   return (
     <Box>   
         <Text textAlign="center" mb={4} fontSize={20}>
@@ -56,7 +79,7 @@ const Profile = () => {
 
         <Box display="flex" gap={7} justifyContent="center">
           <Button onClick={logOut}> Log Out </Button>
-          <Button onClick={() => {}}> Delete Account </Button>
+          <Button onClick={deleteAccount}> Delete Account </Button>
         </Box>
     </Box>
   );
