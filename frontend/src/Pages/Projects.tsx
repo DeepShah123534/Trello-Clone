@@ -1,77 +1,70 @@
-// import { Box, Text } from "@chakra-ui/react";
-// import { useLoaderData, useNavigate } from "react-router-dom";
-// import { useState } from "react";
-// import CreateProjectAccordion from "../components/ui/Projects/CreateProjectAccordion";
+import { Box, Text } from "@chakra-ui/react";
+import { useLoaderData } from "react-router-dom";
+import { Data } from "./Profile";
 
-// interface Project {
-//   id: string;
-//   name: string;
-//   description: string;
-//   status: string;
-// }
-
-// interface User {
-//   name: string;
-//   projects: Project[];
-// }
-
-// const Projects = () => {
-//   const data = useLoaderData() as User;
-
-// const navigate = useNavigate();
-// const [projects, setProjects] = useState<Project[]>(data?.projects ?? []);
+type Project = {
+    name: string;
+    description: string;
+    status: string;
+}
 
 
-// if (!data) {
-//   return <Text textAlign="center">Loading or no data available...</Text>;
-// }
-
-// const goToProject = (projectId: string) => {
-//   navigate(`/project/${projectId}`);
-// };
-
-//   return (
-//     <Box maxW="1000px" mx="auto" px={6}>
-      
-//       <Text textAlign="center" mb={4} fontSize={20}>
-//         {data.name}'s Projects
-//       </Text>
-
-//       <Box mb={10}>
-//         {projects.map((project) => (
-//           <Box
-//             key={project.id}
-//             display="flex"
-//             border="1px solid"
-//             borderColor="gray.300"
-//             p={4}
-//             mb={4}
-//             borderRadius="md"
-//             onClick={() => goToProject(project.id)}
-//             _hover={{ bg: "gray.100", cursor: "pointer" }}
-//           >
-//             <Text w="20%" fontWeight="semibold">
-//               {project.name}
-//             </Text>
-//             <Text flex={1}>{project.description}</Text>
-//             <Text w="15%" ml={6} color="gray.600">
-//               {project.status}
-//             </Text>
-//           </Box>
-//         ))}
-//       </Box>
-
-//       <CreateProjectAccordion projects={projects} setProjects={setProjects} />
-//     </Box>
-//   );
-// };
-
-// export default Projects;
-
-import { Box } from "@chakra-ui/react";
+const fakeProjects: Project[]= [
+    {
+        name: "Project A",
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        status: "To-Do",
+    },
+    {
+        name: "Project B",
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        status: "To-Do",
+    },
+    {
+        name: "Project C",
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        status: "In Progress",
+    },
+    {
+        name: "Project D",
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        status: "To-Do",
+    },
+    {
+        name: "Project E",
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        status: "In Progress",
+    },
+    {
+        name: "Project F",
+        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+        status: "Done",
+    },
+]
 
 const Projects = () => {
-    return  <Box>Projects Page</Box>
-};  
+  const data = useLoaderData() as Data;
+
+  return (
+    <Box>
+      <Text textAlign="center" mb={4} fontSize={20}>
+        {data.name}'s Projects
+      </Text>
+      <Box m={10} >
+        {fakeProjects.map((project) => {
+          return (
+            <Box display="flex" border="1px solid"  p={4} mb={6}>
+              <Text w="15%">{project.name}</Text>
+              <Text lineClamp="2" flex={3}>{project.description}</Text>
+              <Text w="15%" ml={10}>{project.status}</Text>
+            </Box>
+          )
+        })}
+      </Box>
+    </Box>
+  );
+};
+
+
 
 export default Projects;

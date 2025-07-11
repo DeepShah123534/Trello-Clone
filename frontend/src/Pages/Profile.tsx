@@ -20,8 +20,6 @@ const Profile = () => {
  
     const navigate = useNavigate();
     const context = useOutletContext() as Context;
-  
-    console.log(' PROFILE DATA: ', data )
 
     const logOut = () => {
         localStorage.removeItem("token");

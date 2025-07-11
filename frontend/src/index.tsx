@@ -48,6 +48,30 @@ const router = createBrowserRouter([
       {
         path: "/projects",
         element: <Projects />,
+        loader: async () => {
+          // get token from local Storage
+          const token = localStorage.getItem("token");
+
+          // If we have a token. we will use it as a bearer token on our request for user data
+          if(token) {
+            try{
+              const response = await axios.get('http://localhost:3000/auth/user-projects',
+              { headers: { Authorization: `Bearer ${token}`} }
+            );
+            return response.data;
+            } catch (error) {
+              // If we have an expired token, we will use error and redirect user to log-in page
+              alert("You must be signed in to view this page.")
+              // alert("There was an error");
+              return redirect("/log-in");
+            }
+          } else {
+            alert("You must have an account to view this page.")
+            return redirect("/sign-up");
+          }
+
+          // If we don't have a token, we will use error and redirectrct user to sign-up page
+        },
       },
       {
         path: "/profile",
