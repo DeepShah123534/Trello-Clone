@@ -1,12 +1,17 @@
 import { Box, Text } from "@chakra-ui/react";
 import { useLoaderData } from "react-router-dom";
 import { Data } from "./Profile";
+import CreateProjectAccordion from '../components/ui/Projects/CreateProjectAccordion';
+import { useState } from "react";
 
-type Project = {
+export type Project = {
     name: string;
-    description: string;
+    description?: string;
     status: string;
+
 }
+
+
 
 
 const fakeProjects: Project[]= [
@@ -31,11 +36,6 @@ const fakeProjects: Project[]= [
         status: "To-Do",
     },
     {
-        name: "Project E",
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        status: "In Progress",
-    },
-    {
         name: "Project F",
         description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         status: "Done",
@@ -44,6 +44,7 @@ const fakeProjects: Project[]= [
 
 const Projects = () => {
   const data = useLoaderData() as Data;
+  const[projects, setProjects] = useState(fakeProjects);
 
   return (
     <Box>
@@ -51,7 +52,7 @@ const Projects = () => {
         {data.name}'s Projects
       </Text>
       <Box m={10} >
-        {fakeProjects.map((project) => {
+        {projects.map((project) => {
           return (
             <Box display="flex" border="1px solid"  p={4} mb={6}>
               <Text w="15%">{project.name}</Text>
@@ -60,6 +61,7 @@ const Projects = () => {
             </Box>
           )
         })}
+        <CreateProjectAccordion projects={projects} setProjects={setProjects}/>
       </Box>
     </Box>
   );
