@@ -2,6 +2,7 @@ import { Accordion, Span, Box, Input, Textarea, Button } from "@chakra-ui/react"
 import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/form-control';
 import { useState } from "react";
 import { Project } from "@/Pages/Projects";
+import axios from "axios";
 
 type Props = {
   projects: Project[];
@@ -15,6 +16,8 @@ const CreateProjectAccordion = ({ projects, setProjects} : Props) => {
 
   const [submitClickedName, setSubmitClickedName] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const isErrorName = name === "" && submitClickedName;
 
     const onchangeName = (e: any) => {
@@ -27,11 +30,25 @@ const CreateProjectAccordion = ({ projects, setProjects} : Props) => {
     };
 
     const onSubmit = () => {
-        setSubmitClickedName(true);
-        console.log('NAME: ', name);
-        console.log('DESCRIPTION: ', description);
 
-        setProjects ([
+        setSubmitClickedName(true);
+        if (name !== ' ') {
+          setIsOpen(false);
+
+          const token = localStorage.getItem("token");
+          axios.post('http://localhost:3000/auth/create-projects',
+            {
+              name,
+              description,
+            
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+          ).then((response) => {
+            console.log("Project created successfully", response.data);
+          })
+
+
+          setProjects ([
             ...projects,
             {
                 name, 
@@ -39,17 +56,17 @@ const CreateProjectAccordion = ({ projects, setProjects} : Props) => {
                 status: "To-Do",
             },
         ]);
-
         setName("");
         setDescription("");
         setSubmitClickedName(false);
+        }
     };
 
   return (
-    <Accordion.Root multiple defaultValue={["a"]} border="1px solid" borderColor="gray.300" borderRadius="md">
-      <Accordion.Item value="a">
-        <Accordion.ItemTrigger>
-          <Box display="flex" justifyContent="space-between" alignItems="center" w="100%" px={4} >
+    <Accordion.Root collapsible index={isOpen ? [0] : [1]}   border="1px solid" borderColor="gray.300" borderRadius="md">
+      <Accordion.Item >
+        <Accordion.ItemTrigger onClick={() => setIsOpen(false)} >
+          <Box display="flex" justifyContent="space-between" alignItems="center" w="100%" px={4}  onClick={() => setIsOpen(!isOpen)} >
             <Span>Add Project</Span>
             <Accordion.ItemIndicator />
           </Box>

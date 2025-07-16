@@ -4,14 +4,16 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AccountDetailDto } from './auth.controller';
 import { MailService } from 'src/mail/mail.service';
+import { ProjectsService } from 'src/projects/projects.service';
 
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersServices: UsersService,
+    private projectsServices: ProjectsService,
     private jwtService: JwtService,
-    private mailService: MailService
+    private mailService: MailService,
   ) {}
 
   async hashPassword(password: string) {
@@ -149,5 +151,9 @@ export class AuthService {
    
   async deleteUser(id: number) {
     return await this.usersServices.deleteUser(id);
+  }
+
+  async createProject(name: string, description: string, userId: number) {
+    return await this.projectsServices.createProject(name, description, userId);
   }
 }

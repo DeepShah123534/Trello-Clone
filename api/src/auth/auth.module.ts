@@ -5,11 +5,13 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from 'src/mail/mail.module';
+import { ProjectsModule } from 'src/projects/projects.module';
 
 @Module({
   imports: [
     ConfigModule, // <-- Add this
     UsersModule,
+    ProjectsModule,
     MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule], // <-- ensure ConfigModule is available here

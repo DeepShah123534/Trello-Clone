@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 import * as sanitizeHtml from 'sanitize-html';
 import { Transform } from 'class-transformer';
 import { AuthGuard } from './auth.guard';
@@ -64,6 +64,19 @@ export class newPasswordDto {
 
 }
 
+export class ProjectDto {
+  @IsNotEmpty()
+  @Transform((params) => sanitizeHtml(params.value))
+  name: string;
+
+  @IsOptional()
+  @Transform((params) => sanitizeHtml(params.value))
+  description: string;
+
+  // @IsNotEmpty()
+  // id: number;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -114,4 +127,17 @@ export class AuthController {
   getUserProjects(@Request() req) {
     return this.authService.getProfileData(req.user.sub);
   }
+
+  @UseGuards(AuthGuard)
+  @Post('create-projects')
+  createProject(@Body() projectDto: ProjectDto, @Request() req) {
+    console.log('PROJECT INFO: ', projectDto);
+    console.log('REQ', req.user.sub)
+    return this.authService.createProject(
+      projectDto.name,
+      projectDto.description,
+      req.user.sub,
+    );
+  }
+
 }
