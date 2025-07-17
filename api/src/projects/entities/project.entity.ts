@@ -1,22 +1,24 @@
 import { User } from 'src/users/entities/user.entity';
-
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.projects)
+  @ManyToOne(() => User, (user) => user.projects, { eager: true }) // eager loads user automatically
+  @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column()
+  userId: number; // Add this so you can filter easily in queries
 
   @Column()
   name: string;
 
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   description?: string;
 
   @Column({ default: 'To Do' })
   status: string;
-
 }
