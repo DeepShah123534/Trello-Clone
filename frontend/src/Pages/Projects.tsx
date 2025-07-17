@@ -11,45 +11,26 @@ export type Project = {
 
 }
 
+type LoaderData = {
+  user:Data;
+  projects:Project[];
 
-
-
-const fakeProjects: Project[]= [
-    {
-        name: "Project A",
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        status: "To-Do",
-    },
-    {
-        name: "Project B",
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        status: "To-Do",
-    },
-    {
-        name: "Project C",
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        status: "In Progress",
-    },
-    {
-        name: "Project D",
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        status: "To-Do",
-    },
-    {
-        name: "Project F",
-        description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        status: "Done",
-    },
-]
+}
 
 const Projects = () => {
-  const data = useLoaderData() as Data;
-  const[projects, setProjects] = useState(fakeProjects);
+  const data = useLoaderData() as LoaderData;
+  const user = data.user as Data;
+  
+  console.log('LOADER DATA: ', data)
+
+  const[projects, setProjects] = useState(data.projects);
+
+  
 
   return (
     <Box>
       <Text textAlign="center" mb={4} fontSize={20}>
-        {data.name}'s Projects
+        {user.name}'s Projects
       </Text>
       <Box m={10} >
         {projects.map((project) => {
@@ -61,8 +42,8 @@ const Projects = () => {
             </Box>
           )
         })}
-        <CreateProjectAccordion projects={projects} setProjects={setProjects} />
-      </Box>
+         <CreateProjectAccordion projects={projects} setProjects={setProjects} />
+       </Box>  
     </Box>
   );
 };

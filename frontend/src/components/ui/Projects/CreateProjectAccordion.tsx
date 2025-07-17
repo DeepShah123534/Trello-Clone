@@ -45,20 +45,15 @@ const CreateProjectAccordion = ({ projects, setProjects} : Props) => {
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
             console.log("Project created successfully", response.data);
+            setProjects (response.data);
+            setName("");
+            setDescription("");
+            setSubmitClickedName(false);
+          }).catch ((error) => {
+            console.log('ERROR', error);
+            alert("There was an error vreating porject try again")
           })
 
-
-          setProjects ([
-            ...projects,
-            {
-                name, 
-                description,
-                status: "To-Do",
-            },
-        ]);
-        setName("");
-        setDescription("");
-        setSubmitClickedName(false);
         }
     };
 

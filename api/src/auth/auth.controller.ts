@@ -103,6 +103,22 @@ export class AuthController {
     return this.authService.getProfileData(req.user.sub);
   }
 
+  @UseGuards(AuthGuard)
+  @Get('user-projects')
+  getUserProjects(@Request() req) {
+    return this.authService.getUserProjects(req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('create-projects')
+  createProject(@Body() projectDto: ProjectDto, @Request() req) {
+    return this.authService.createProject(
+      projectDto.name,
+      projectDto.description,
+      req.user.sub,
+    );
+  }
+
   @Post('reset-password')
   sendResetPasswordEmail(@Body() email: Email) {
     return this.authService.sendResetPassword(email.email);
@@ -120,24 +136,6 @@ export class AuthController {
   @Post('delete-user')
   deleteuser(@Request() req){
     return this.authService.deleteUser(req.user.sub);
-  }
-
-  @Get('user-projects')
-  @UseGuards(AuthGuard)
-  getUserProjects(@Request() req) {
-    return this.authService.getProfileData(req.user.sub);
-  }
-
-  @UseGuards(AuthGuard)
-  @Post('create-projects')
-  createProject(@Body() projectDto: ProjectDto, @Request() req) {
-    console.log('PROJECT INFO: ', projectDto);
-    console.log('REQ', req.user.sub)
-    return this.authService.createProject(
-      projectDto.name,
-      projectDto.description,
-      req.user.sub,
-    );
   }
 
 }
