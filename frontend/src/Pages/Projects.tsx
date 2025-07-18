@@ -9,7 +9,6 @@ export type Project = {
     name: string;
     description?: string;
     status: string;
-
 }
 
 type LoaderData = {
