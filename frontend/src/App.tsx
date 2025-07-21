@@ -1,6 +1,7 @@
 import { Provider } from "./components/ui/provider";
 import { Outlet, useLoaderData } from "react-router-dom";
 import Header from "./components/ui/Header";
+import { Toaster } from "./components/ui/toaster"
 
 import { useState } from "react";
  
@@ -31,6 +32,7 @@ function App() {
     <Provider>
       <Header loggedIn={loggedIn}/>
       <Outlet context={context}/>
+      <Toaster />
     </Provider>
   );
 }

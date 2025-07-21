@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AccountDetailDto } from './auth.controller';
 import { MailService } from 'src/mail/mail.service';
 import { ProjectsService } from 'src/projects/projects.service';
+import { FeaturesService } from 'src/features/features.service';
 
 
 @Injectable()
@@ -13,6 +14,7 @@ export class AuthService {
     private usersServices: UsersService,
     private projectsServices: ProjectsService,
     private jwtService: JwtService,
+    private featuresService: FeaturesService,
     private mailService: MailService,
   ) {}
 
@@ -171,5 +173,15 @@ export class AuthService {
     return await this.projectsServices.createProject(name, description, userId);
   }
 
+  async createFeature(name: string, description: string, userId: number, projectId: number) {
+    const projects = await this.projectsServices.getUserProjects(userId);
+    const project = projects.find((project) => project.id === projectId);
+
+    if (project && project.id) {
+      return await this.featuresService.createFeature(name, description, projectId);
+    } else {
+      throw new UnauthorizedException('project not found');
+    }
+  }
 
 }

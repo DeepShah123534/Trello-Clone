@@ -72,9 +72,19 @@ export class ProjectDto {
   @IsOptional()
   @Transform((params) => sanitizeHtml(params.value))
   description: string;
+}
 
-  // @IsNotEmpty()
-  // id: number;
+export class FeatureDto {
+  @IsNotEmpty()
+  @Transform((params) => sanitizeHtml(params.value))
+  name: string;
+
+  @IsOptional()
+  @Transform((params) => sanitizeHtml(params.value))
+  description: string;
+
+  @IsNotEmpty()
+  projectId: number;
 }
 
 @Controller('auth')
@@ -122,6 +132,17 @@ export class AuthController {
       projectDto.name,
       projectDto.description,
       req.user.sub,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('create-feature')
+  createFeature(@Body() featureDto: FeatureDto, @Request() req) {
+    return this.authService.createFeature(
+      featureDto.name,
+      featureDto.description,
+      req.user.sub,
+      featureDto.projectId,
     );
   }
 

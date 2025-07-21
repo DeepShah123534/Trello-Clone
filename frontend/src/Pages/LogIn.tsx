@@ -1,3 +1,4 @@
+
 import { Context } from '@/App';
 import ForgotPassword from '../components/ui/Login/ForgotPassword';
 import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/form-control';
@@ -5,6 +6,8 @@ import { Box, Button, Input, Text } from '@chakra-ui/react';
 import axios from 'axios';
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { toaster } from "../components/ui/toaster"
+
 
 const LogIn = () => {
   const [username, setUsername] = useState("");
@@ -48,17 +51,27 @@ const LogIn = () => {
         context.toggleLoggedIn();
         localStorage.setItem("token", token);
 
+        toaster.success({
+          title: `Sign in successful! Welcome ${username}`,
+          type: "success", // 👈 "type" determines color/indicator
+          closable: true,
+        })
+
+
         setUsername("");
         setPassword("");
         setSubmitClickedUsername(false);
         setSubmitClickedPassword(false);
 
-        alert(`Sign in successful! Welcome ${username}`);
         navigate("/projects");
       })
       .catch((error) => {
-        console.error("ERROR: ", error);
-        alert("There was an error logging in.");
+        console.error("ERROR: ", error.response?.data || error.message);
+          toaster.error({
+            title: "Sign-in failed",
+            description: "Please check your credentials and try again.",
+            closable: true,
+          })
       });
   };
 

@@ -1,6 +1,15 @@
 import { Box, Text } from "@chakra-ui/react"
 import { useLoaderData } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
+import CreateFeatureAccordion from "../components/ui/Projects/CreateFeatureAccordion";
+import { useState } from "react";
+
+export type Feature = {
+    name: string;
+    status: "To Do" | "In Progress" | "Done!";
+    userStoriesCount: number;
+    completedUserStories: number;
+}
 
 const columns = [
     {
@@ -14,7 +23,7 @@ const columns = [
     }
 ];
 
-const features =[
+const sampleFeatures: Feature[] =[
     {
         name:"Feature 1",
         status:"To Do",
@@ -67,7 +76,9 @@ const features =[
 const Project = () => {
     const project = useLoaderData() as ProjectType;
 
-    console.log("PROJECT: ", project);
+    const [features, setFeatures] = useState(project.features)
+
+    console.log("FEATURES: ", features);
     return (
         <Box m={10}>
             <Box mb={20}>
@@ -84,17 +95,27 @@ const Project = () => {
                         <Box border="1px solid" flex={1} >
                             <Text textAlign="center" fontSize={20} mt={5}>{column.name}</Text>
                             {features.map ((feature) => {
-                                console.log("COLUMN NAME: ", column.name);
-                                console.log("STATUS: ", feature.status)
                                 if (column.name === feature.status){
                                     return (
-                                    <Box border="1px solid" p={4} m={4} display="flex"  justifyContent="space-between">
+                                    <Box border="1px solid" p={4} mx={4} mt={4} display="flex"  justifyContent="space-between">
                                          <Text mt={5}>{feature.name}</Text>
                                          <Text mt={5}>{feature.completedUserStories} / {feature.userStoriesCount}</Text>
                                     </Box>
                                     );
+                                } else {
+                                    return null;
                                 }
                             })}
+                            <Box p={4}>
+                                {
+                                    column.name === "To Do" && 
+                                    < CreateFeatureAccordion 
+                                    features={features} 
+                                    setFeatures={setFeatures}
+                                    projectId={project.id}
+                                    />
+                                }
+                            </Box>
                         </Box>
                     );
                 })}
