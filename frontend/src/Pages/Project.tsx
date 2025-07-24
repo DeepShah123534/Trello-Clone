@@ -1,87 +1,37 @@
-import { Box, Text } from "@chakra-ui/react"
+import { Box, Text, useDisclosure } from "@chakra-ui/react";
 import { useLoaderData } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
-import CreateFeatureAccordion from "../components/ui/Projects/CreateFeatureAccordion";
+import CreateFeatureAccordion from "../components/ui/Feature/CreateFeatureAccordion";
 import { useState } from "react";
-
+import FeatureModal from "../components/ui/Feature/FeatureModal";
 export type Feature = {
     name: string;
     status: "To Do" | "In Progress" | "Done!";
     userStoriesCount: number;
     completedUserStories: number;
-}
+    description?: string;
+}   
 
 const columns = [
-    {
-        name:"To Do"
-    },
-    {
-        name:"In Progress"
-    },
-    {
-        name: "Done!"
-    }
+    { name:"To Do" },
+    { name:"In Progress" },
+    { name: "Done!" }
 ];
 
-const sampleFeatures: Feature[] =[
-    {
-        name:"Feature 1",
-        status:"To Do",
-        userStoriesCount: 10,
-        completedUserStories: 0,
-    },
-    {
-        name:"Feature 2",
-        status:"To Do",
-        userStoriesCount: 10,
-        completedUserStories: 0,
-    },
-    {
-        name:"Feature 3",
-        status:"In Progress",
-        userStoriesCount: 10,
-        completedUserStories: 3,
-    },
-    {
-        name:"Feature 4",
-        status:"Done!",
-        userStoriesCount: 10,
-        completedUserStories: 10,
-    },
-    {
-        name:"Feature 5",
-        status:"In Progress",
-        userStoriesCount: 10,
-        completedUserStories: 5,
-    },
-    {
-        name:"Feature 6",
-        status:"Done!",
-        userStoriesCount: 10,
-        completedUserStories: 10,
-    },
-    {
-        name:"Feature 7",
-        status:"To Do",
-        userStoriesCount: 15,
-        completedUserStories: 0,
-    },{
-        name:"Feature 8",
-        status:"To Do",
-        userStoriesCount: 8,
-        completedUserStories: 0,
-    },
-]
 
 const Project = () => {
     const project = useLoaderData() as ProjectType;
 
     const [features, setFeatures] = useState(project.features)
 
+    const { open, onOpen, onClose } = useDisclosure();
+
+    const [ selectedFeature, setSelectedFeature ] = useState(features[0]);
+
     console.log("FEATURES: ", features);
     return (
-        <Box m={10}>
-            <Box mb={20}>
+        <Box m={10} >
+            <Box mb={20} >
             <Text mb={4} fontSize={20}>
                 {project.name}
             </Text>
@@ -97,10 +47,24 @@ const Project = () => {
                             {features.map ((feature) => {
                                 if (column.name === feature.status){
                                     return (
-                                    <Box border="1px solid" p={4} mx={4} mt={4} display="flex"  justifyContent="space-between">
+                                    <Box 
+                                    border="1px solid" p={4} mx={4} mt={4} 
+                                    display="flex"  
+                                    justifyContent="space-between"
+                                    onClick={onOpen}
+                                    _hover={{cursor:"pointer"}}
+                                    >
+                                    <FeatureModal 
+                                         open={open} 
+                                         onClose={onClose} 
+                                         featureName={selectedFeature.name} 
+                                         featureDescription={selectedFeature.description || "There is no description..."}
+                                     />
                                          <Text mt={5}>{feature.name}</Text>
                                          <Text mt={5}>{feature.completedUserStories} / {feature.userStoriesCount}</Text>
+                                         
                                     </Box>
+                                    
                                     );
                                 } else {
                                     return null;
@@ -116,10 +80,12 @@ const Project = () => {
                                     />
                                 }
                             </Box>
+                            
                         </Box>
                     );
                 })}
             </Box>
+            
         </Box>
     );
 }

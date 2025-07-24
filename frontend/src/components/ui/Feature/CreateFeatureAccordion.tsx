@@ -85,7 +85,7 @@ const CreateFeatureAccordion = ({ features, setFeatures, projectId } : Props) =>
                 <Textarea  value={description} onChange={onChangeDescription} />
             
             </FormControl>
-            <Button w="1680px" ml={2} onClick={onSubmit}>
+            <Button width="100%" ml={2} onClick={onSubmit}>
                 Create Feature
             </Button>
           </Accordion.ItemBody>

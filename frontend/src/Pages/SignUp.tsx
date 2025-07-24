@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/form-control";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Context } from "@/App";
+import { toaster } from "../components/ui/toaster";
 
 
 export const isInvalidEmail =(email:string) => {
@@ -124,12 +125,19 @@ const SignUp = () => {
             setSubmitClickedPassword(false);
             setSubmitClickedSecondPassword(false);
 
-            alert("Account created successfully!");
+            toaster.success({
+                title: "Account create successfully",
+                type: "success", // 👈 "type" determines color/indicator
+                closable: true,
+             })
             navigate("/projects");
             })
             .catch((error) => {
                 console.error("ERROR: ", error);
-                alert("There was an error");
+                toaster.error({
+                    title: "There was an error",
+                    closable: true,
+                })
             });
         }
         
