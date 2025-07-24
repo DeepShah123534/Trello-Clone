@@ -36,18 +36,6 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
 
 ---
 
-## 📂 Project Structure
-
-/frontend
-├── src/
-│   ├── Pages/
-│   ├── components/ui/Projects/
-│   └── …
-/api
-├── src/
-│   ├── auth/
-│   ├── projects/
-│   └── users/
 
 🔄 Upcoming Features
 	•	✅ Full CRUD for tasks inside projects
