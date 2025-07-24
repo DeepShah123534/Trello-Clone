@@ -1,5 +1,7 @@
 import { Box, Text, CloseButton, Dialog, Portal } from "@chakra-ui/react"
 import UserStoryDetailAccordion from "../UserStories/UserStoryDetailAccordion";
+import CreateUserStoryAccordion from "../UserStories/CreateUserStoryAccordion";
+import { useState } from "react";
 
 
 type Props = {
@@ -7,6 +9,13 @@ type Props = {
     onClose:  () => void;
     featureName: string;
     featureDescription: string;
+    featureId: number;
+}
+
+export type UserStory = {
+    name: string;
+    description: string;
+    status: string;
 }
 
 const sampleUserStories = [
@@ -17,7 +26,8 @@ const sampleUserStories = [
     { name: "User Story", description:"This is User Story description", status:"6/13", },
 ] 
 
-const FeatureModal = ({ open, onClose, featureName, featureDescription }: Props) => {
+const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, }: Props) => {
+    const [userStories, setUserStories] = useState(sampleUserStories)
     return (
      
             <Dialog.Root 
@@ -50,14 +60,18 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription }: Props)
                             <Box display="flex" flexDirection="column" gap={5}>
                             {sampleUserStories.map((story, index) => {
                                 return (
-
-                                         <UserStoryDetailAccordion 
-                                            name={`${story.name} ${index + 1}`}
-                                            status={story.status}
-                                            description={`${story.description} ${index + 1}`}
-                                         />
+                                 <UserStoryDetailAccordion 
+                                    name={`${story.name} ${index + 1}`}
+                                    status={story.status}
+                                    description={`${story.description} ${index + 1}`}
+                                 />
                                 )
                             })}
+                            <CreateUserStoryAccordion 
+                            userStories={userStories} 
+                            setUserStories={setUserStories}
+                            featureId={featureId}
+                            />
                             </Box>
                         </Dialog.Body>
                     </Dialog.Content>

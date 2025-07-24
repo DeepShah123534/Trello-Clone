@@ -10,6 +10,7 @@ export type Feature = {
     userStoriesCount: number;
     completedUserStories: number;
     description?: string;
+    id: number;
 }   
 
 const columns = [
@@ -51,7 +52,10 @@ const Project = () => {
                                     border="1px solid" p={4} mx={4} mt={4} 
                                     display="flex"  
                                     justifyContent="space-between"
-                                    onClick={onOpen}
+                                    onClick={() => {
+                                        onOpen();
+                                        setSelectedFeature(feature);
+                                    }}
                                     _hover={{cursor:"pointer"}}
                                     >
                                     <FeatureModal 
@@ -59,7 +63,9 @@ const Project = () => {
                                          onClose={onClose} 
                                          featureName={selectedFeature.name} 
                                          featureDescription={selectedFeature.description || "There is no description..."}
+                                         featureId={selectedFeature.id}
                                      />
+                                     
                                          <Text mt={5}>{feature.name}</Text>
                                          <Text mt={5}>{feature.completedUserStories} / {feature.userStoriesCount}</Text>
                                          

@@ -3,26 +3,25 @@ import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/form-contro
 import { useState } from "react";
 
 import axios from "axios";
-import { Feature } from "@/Pages/Project";
+import { UserStory } from "../Feature/FeatureModal";
 import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
-  features: Feature[];
-  setFeatures: React.Dispatch<React.SetStateAction<Feature[]>>;
-  projectId: number;
+  userStories: UserStory[];
+  setUserStories: React.Dispatch<React.SetStateAction<UserStory[]>>;
+  featureId: number;
 } 
 
-const CreateFeatureAccordion = ({ features, setFeatures, projectId } : Props) => {
+const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId } : Props) => {
 
   const [name, setName] = useState(""); 
   const [description, setDescription] = useState(""); 
+  const navigate = useNavigate();
 
   const [submitClickedName, setSubmitClickedName] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
-
-  const navigate = useNavigate()
 
   const isErrorName = name === "" && submitClickedName;
 
@@ -41,39 +40,44 @@ const CreateFeatureAccordion = ({ features, setFeatures, projectId } : Props) =>
         if (name !== ' ') {
           setIsOpen(false);
 
+          console.log('NAME', name);
+          console.log('DESCRIPTION', description)
+
           const token = localStorage.getItem("token");
 
-          axios.post('http://localhost:3000/auth/create-feature',
+          axios.post('http://localhost:3000/auth/create-user-story',
             {
               name,
               description,
-              projectId,
+              featureId,
             },
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
             console.log("Project created successfully", response.data);
-            setFeatures (response.data);
+            setUserStories (response.data);
             setName("");
             setDescription("");
             setSubmitClickedName(false);
           }).catch ((error) => {
 
-            console.log('ERROR', error);
+            if (error.response.data.message === 'Unauthorized') {
+                toaster.error({
+                  title: "Error",
+                  description: "Your session has expired log in again.",
+                  closable: true,
+                });
+                navigate('/log-in')
+            } else {
+              toaster.error({
+                  title: "Error",
+                  description: "Your session has expired log in again.",
+                  closable: true,
+                });
+            }
 
-                if (error.response.data.message === 'Unauthorized') {
-                    toaster.error({
-                      title: "Error",
-                      description: "Your session has expired log in again.",
-                      closable: true,
-                    });
-                    navigate('/log-in')
-                } else {
-                  toaster.error({
-                      title: "Error",
-                      description: "Your session has expired log in again.",
-                      closable: true,
-                    });
-                }
+
+
+            alert("There was an error creating feature try again")
           })
 
         }
@@ -84,26 +88,26 @@ const CreateFeatureAccordion = ({ features, setFeatures, projectId } : Props) =>
       <Accordion.Item >
         <Accordion.ItemTrigger onClick={() => setIsOpen(false)} >
           <Box display="flex" justifyContent="space-between" alignItems="center" w="100%" px={4}  onClick={() => setIsOpen(!isOpen)} >
-            <Span>Add Feature</Span>
+            <Span>Add User Story</Span>
             <Accordion.ItemIndicator />
           </Box>
         </Accordion.ItemTrigger>
         <Accordion.ItemContent>
           <Accordion.ItemBody borderTop="1px solid" pb={4}>
             <FormControl pl={10} pr={8} isInvalid={isErrorName} isRequired mb={2}>
-                <FormLabel>Feature Name:</FormLabel>
+                <FormLabel>User Story Name:</FormLabel>
                 <Input type="text" value={name} onChange={onchangeName} />
                 {!isErrorName ? null : (
-                    <FormErrorMessage>Feature Name is required</FormErrorMessage>
+                    <FormErrorMessage>User Story Name is required</FormErrorMessage>
                 )}
             </FormControl>
             <FormControl pl={10} pr={8} mb={4}>
-                <FormLabel>Feature Description:</FormLabel>
+                <FormLabel>User Story Description:</FormLabel>
                 <Textarea  value={description} onChange={onChangeDescription} />
             
             </FormControl>
             <Button width="100%" ml={2} onClick={onSubmit}>
-                Create Feature
+                Create User Story
             </Button>
           </Accordion.ItemBody>
         </Accordion.ItemContent>
@@ -113,4 +117,4 @@ const CreateFeatureAccordion = ({ features, setFeatures, projectId } : Props) =>
   );
 };
 
-export default CreateFeatureAccordion;  
+export default CreateUserStoryAccordion;  

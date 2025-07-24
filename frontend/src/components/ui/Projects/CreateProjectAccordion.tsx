@@ -3,6 +3,8 @@ import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/form-contro
 import { useState } from "react";
 import { Project } from "@/Pages/Projects";
 import axios from "axios";
+import { toaster } from "../toaster";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   projects: Project[];
@@ -17,6 +19,8 @@ const CreateProjectAccordion = ({ projects, setProjects} : Props) => {
   const [submitClickedName, setSubmitClickedName] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const isErrorName = name === "" && submitClickedName;
 
@@ -50,8 +54,20 @@ const CreateProjectAccordion = ({ projects, setProjects} : Props) => {
             setDescription("");
             setSubmitClickedName(false);
           }).catch ((error) => {
-            console.log('ERROR', error);
-            alert("There was an error vreating porject try again")
+              if (error.response.data.message === 'Unauthorized') {
+                  toaster.error({
+                    title: "Error",
+                    description: "Your session has expired log in again.",
+                    closable: true,
+                  });
+                  navigate('/log-in')
+              } else {
+                toaster.error({
+                    title: "Error",
+                    description: "Your session has expired log in again.",
+                    closable: true,
+                  });
+              }
           })
 
         }
