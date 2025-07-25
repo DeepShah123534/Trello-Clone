@@ -2,8 +2,9 @@ import { Body, Controller, Get, Param, Post, Request, UseGuards } from '@nestjs/
 import { AuthService } from './auth.service';
 import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 import * as sanitizeHtml from 'sanitize-html';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { AuthGuard } from './auth.guard';
+
 
 export class SignUpDto {
   @IsNotEmpty()
@@ -97,7 +98,11 @@ export class UserStoryDto {
   description: string;
 
   @IsNotEmpty()
+  @Type(() => Number)
   featureId: number;
+
+  @IsNotEmpty()
+  projectId: number;
 }
 
 @Controller('auth')
@@ -162,7 +167,14 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('create-user-story')
   createUserStory(@Body() userStoryDto: UserStoryDto, @Request() req) {
-console.log('user story dto: ', userStoryDto, req.user.sub )
+    console.log('user story dto: ', userStoryDto, req.user.sub )
+    return this.authService.createUserStory(
+      userStoryDto.name,
+      userStoryDto.description,
+      req.user.sub,
+      userStoryDto.featureId,
+      userStoryDto.projectId,
+    )
   }
 
   @Post('reset-password')

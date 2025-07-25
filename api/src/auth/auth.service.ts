@@ -6,6 +6,7 @@ import { AccountDetailDto } from './auth.controller';
 import { MailService } from 'src/mail/mail.service';
 import { ProjectsService } from 'src/projects/projects.service';
 import { FeaturesService } from 'src/features/features.service';
+import { UserStoriesService } from 'src/userStories/userStories.service';
 
 
 @Injectable()
@@ -15,6 +16,7 @@ export class AuthService {
     private projectsServices: ProjectsService,
     private jwtService: JwtService,
     private featuresService: FeaturesService,
+    private userStoriesService: UserStoriesService,
     private mailService: MailService,
   ) {}
 
@@ -183,5 +185,25 @@ export class AuthService {
       throw new UnauthorizedException('project not found');
     }
   }
+
+    async createUserStory(name: string, description: string, userId: number, featureId: number, projectId: number) {
+      const projects = await this.projectsServices.getUserProjects(userId);
+
+      const project = projects.find((project) => project.id === projectId);
+
+      if (!project || !project.features) {
+        console.log("❌ Project or its features not found!");
+        throw new UnauthorizedException('project or features not found');
+      }
+
+      const feature = project.features.find((feature) => feature.id === featureId);
+
+      if (feature && feature.id) {
+        return await this.userStoriesService.createUserStory(name, description, featureId);
+      } else {
+        console.log("❌ Feature not found!");
+        throw new UnauthorizedException('feature not found');
+      }
+    }
 
 }

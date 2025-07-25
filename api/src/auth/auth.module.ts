@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from 'src/mail/mail.module';
 import { ProjectsModule } from 'src/projects/projects.module';
 import { FeaturesModule } from 'src/features/features.module';
+import { UserStoriesModule } from 'src/userStories/userStories.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { FeaturesModule } from 'src/features/features.module';
     UsersModule,
     ProjectsModule,
     FeaturesModule,
+    UserStoriesModule,
     MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule], // <-- ensure ConfigModule is available here

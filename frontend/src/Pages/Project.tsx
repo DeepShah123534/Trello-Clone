@@ -3,7 +3,9 @@ import { useLoaderData } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
 import CreateFeatureAccordion from "../components/ui/Feature/CreateFeatureAccordion";
 import { useState } from "react";
-import FeatureModal from "../components/ui/Feature/FeatureModal";
+import FeatureModal, { UserStory } from "../components/ui/Feature/FeatureModal";
+
+
 export type Feature = {
     name: string;
     status: "To Do" | "In Progress" | "Done!";
@@ -11,6 +13,7 @@ export type Feature = {
     completedUserStories: number;
     description?: string;
     id: number;
+    userStories: UserStory[];
 }   
 
 const columns = [
@@ -22,14 +25,13 @@ const columns = [
 
 const Project = () => {
     const project = useLoaderData() as ProjectType;
-
-    const [features, setFeatures] = useState(project.features)
+    const [features, setFeatures] = useState<Feature[]>(project.features)
 
     const { open, onOpen, onClose } = useDisclosure();
+    // const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
+    const [selectedFeature, setSelectedFeature] = useState(features[0]);
 
-    const [ selectedFeature, setSelectedFeature ] = useState(features[0]);
-
-    console.log("FEATURES: ", features);
+    
     return (
         <Box m={10} >
             <Box mb={20} >
@@ -53,18 +55,13 @@ const Project = () => {
                                     display="flex"  
                                     justifyContent="space-between"
                                     onClick={() => {
-                                        onOpen();
                                         setSelectedFeature(feature);
-                                    }}
+                                        setTimeout(() => {
+                                            onOpen();
+                                        }, 0); 
+                                        }}
                                     _hover={{cursor:"pointer"}}
                                     >
-                                    <FeatureModal 
-                                         open={open} 
-                                         onClose={onClose} 
-                                         featureName={selectedFeature.name} 
-                                         featureDescription={selectedFeature.description || "There is no description..."}
-                                         featureId={selectedFeature.id}
-                                     />
                                      
                                          <Text mt={5}>{feature.name}</Text>
                                          <Text mt={5}>{feature.completedUserStories} / {feature.userStoriesCount}</Text>
@@ -91,7 +88,19 @@ const Project = () => {
                     );
                 })}
             </Box>
-            
+            {selectedFeature && (
+                <FeatureModal
+                    open={open}
+                    onClose={onClose}
+                    featureName={selectedFeature.name}
+                    featureDescription={
+                    selectedFeature.description || "There is no description..."
+                    }
+                    featureId={selectedFeature.id}
+                    projectId={project.id}
+                    stories={selectedFeature.userStories}
+                />
+            )}
         </Box>
     );
 }

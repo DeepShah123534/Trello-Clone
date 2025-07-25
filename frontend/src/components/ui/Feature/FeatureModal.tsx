@@ -1,7 +1,7 @@
 import { Box, Text, CloseButton, Dialog, Portal } from "@chakra-ui/react"
 import UserStoryDetailAccordion from "../UserStories/UserStoryDetailAccordion";
 import CreateUserStoryAccordion from "../UserStories/CreateUserStoryAccordion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 type Props = {
@@ -10,6 +10,8 @@ type Props = {
     featureName: string;
     featureDescription: string;
     featureId: number;
+    projectId: number;
+    stories: UserStory[];
 }
 
 export type UserStory = {
@@ -18,16 +20,13 @@ export type UserStory = {
     status: string;
 }
 
-const sampleUserStories = [
-    { name: "User Story", description:"This is User Story description", status:"3/6", },
-    { name: "User Story", description:"This is User Story description", status:"4/10", },
-    { name: "User Story", description:"This is User Story description", status:"1/4", },
-    { name: "User Story", description:"This is User Story description", status:"2/7", },
-    { name: "User Story", description:"This is User Story description", status:"6/13", },
-] 
 
-const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, }: Props) => {
-    const [userStories, setUserStories] = useState(sampleUserStories)
+const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, projectId, stories, }: Props) => {
+        const [userStories, setUserStories] = useState(stories);
+        useEffect(() => {
+            setUserStories(stories)
+        }, [stories])
+
     return (
      
             <Dialog.Root 
@@ -58,10 +57,10 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                         </Dialog.Header>
                         <Dialog.Body>
                             <Box display="flex" flexDirection="column" gap={5}>
-                            {sampleUserStories.map((story, index) => {
+                            {userStories.map((story, index) => {
                                 return (
                                  <UserStoryDetailAccordion 
-                                    name={`${story.name} ${index + 1}`}
+                                    name={`${story.name}`}
                                     status={story.status}
                                     description={`${story.description} ${index + 1}`}
                                  />
@@ -71,6 +70,7 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                             userStories={userStories} 
                             setUserStories={setUserStories}
                             featureId={featureId}
+                            projectId={projectId}
                             />
                             </Box>
                         </Dialog.Body>

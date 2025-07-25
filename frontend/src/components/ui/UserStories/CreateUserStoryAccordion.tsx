@@ -11,9 +11,10 @@ type Props = {
   userStories: UserStory[];
   setUserStories: React.Dispatch<React.SetStateAction<UserStory[]>>;
   featureId: number;
+  projectId: number;
 } 
 
-const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId } : Props) => {
+const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId, projectId } : Props) => {
 
   const [name, setName] = useState(""); 
   const [description, setDescription] = useState(""); 
@@ -37,23 +38,35 @@ const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId } : P
     const onSubmit = () => {
 
         setSubmitClickedName(true);
-        if (name !== ' ') {
+        if (name.trim() !== '') {
           setIsOpen(false);
 
-          console.log('NAME', name);
-          console.log('DESCRIPTION', description)
-
           const token = localStorage.getItem("token");
+
+          if (!token) {
+            toaster.error({
+              title: "Not Authenticated",
+              description: "Please log in again.",
+            });
+            navigate('/log-in');
+            return;
+          }
 
           axios.post('http://localhost:3000/auth/create-user-story',
             {
               name,
               description,
+              projectId,
               featureId,
             },
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
-            console.log("Project created successfully", response.data);
+            // console.log("User Story created successfully", response.data);
+              toaster.success({
+                title: "User Story created successfully",
+                type: "success", // 👈 "type" determines color/indicator
+                closable: true,
+             })
             setUserStories (response.data);
             setName("");
             setDescription("");
@@ -70,14 +83,10 @@ const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId } : P
             } else {
               toaster.error({
                   title: "Error",
-                  description: "Your session has expired log in again.",
+                  description: "There was an error creating user story try again.",
                   closable: true,
                 });
             }
-
-
-
-            alert("There was an error creating feature try again")
           })
 
         }
