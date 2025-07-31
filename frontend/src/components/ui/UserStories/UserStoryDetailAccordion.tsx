@@ -58,9 +58,13 @@ const UserStoryDetailAccordion = ( {name, status,
                             </Box>
                             {devTasks.map((task) =>{
                                 return(
-                                    <Box display="flex" justifyContent="space-between" 
+                                    <Box 
+                                    display="flex" 
+                                    justifyContent="space-between" 
                                     borderTop="1px solid" 
-                                    alignItems="center" px={4} py={2}>
+                                    alignItems="center" 
+                                    px={4} py={2} 
+                                    key={task.name}>
                                         <Text> {task.name}</Text>
                                         <Button mt={2} mr={4}>{task.status}</Button>
                                     </Box>

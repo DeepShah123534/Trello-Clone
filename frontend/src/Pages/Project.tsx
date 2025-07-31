@@ -45,7 +45,7 @@ const Project = () => {
             <Box display="flex" gap={10} >
                 {columns.map((column) => {
                     return (
-                        <Box border="1px solid" flex={1} >
+                        <Box border="1px solid" flex={1} key={column.name}>
                             <Text textAlign="center" fontSize={20} mt={5}>{column.name}</Text>
                             {features.map ((feature) => {
                                 feature.status = "To Do";
@@ -62,6 +62,7 @@ const Project = () => {
                                         }, 0); 
                                         }}
                                     _hover={{cursor:"pointer"}}
+                                    key={feature.id}
                                     >
                                      
                                          <Text mt={5}>{feature.name}</Text>

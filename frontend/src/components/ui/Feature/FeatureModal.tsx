@@ -69,6 +69,7 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                                     projectId={projectId}
                                     userStoryId={story.id}
                                     tasks={story.tasks}
+                                    key={story.id}
                                  />
                                 )
                             })}

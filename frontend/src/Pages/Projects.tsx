@@ -39,7 +39,7 @@ const Projects = () => {
       <Box m={10} >
         {projects.map((project) => {
           return (
-            <Box display="flex" border="1px solid"  p={4} mb={6} onClick={() => {goToProject(project.id)}} _hover={{ cursor: "pointer", backgroundColor: "grey" }}>
+            <Box display="flex" border="1px solid"  p={4} mb={6} onClick={() => {goToProject(project.id)}} _hover={{ cursor: "pointer", backgroundColor: "grey" }} key={project.id}>
               <Text w="15%">{project.name}</Text>
               <Text lineClamp="2" flex={3}>{project.description}</Text>
               <Text w="15%" ml={10}>{project.status}</Text>
