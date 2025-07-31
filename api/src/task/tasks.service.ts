@@ -18,10 +18,9 @@ export class TasksService {
   async createTask(name: string, userStoryId: number) {
     await this.tasksRepository.save({
       name,
-      userStoryId : {
-        id: userStoryId,
-      }
+      userStory: { id: userStoryId }, // ✅ Correct usage
     });
+
     return await this.getUserStoryTasks(userStoryId);
   }
 } 

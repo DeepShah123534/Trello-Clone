@@ -5,14 +5,16 @@ import { useState } from "react";
 import axios from "axios";
 import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
+import { Task } from "../UserStories/UserStoryDetailAccordion";
 
 type Props = {
   featureId: number;
   projectId: number;
   userStoryId: number;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 } 
 
-const CreateTaskAccordion = ({ featureId, projectId, userStoryId } : Props) => {
+const CreateTaskAccordion = ({ featureId, projectId, userStoryId, setTasks } : Props) => {
   console.log('PROJECT ID', projectId)
   console.log('FEATURE ID', featureId)
   console.log('USER STORY ID', userStoryId)
@@ -59,6 +61,7 @@ const CreateTaskAccordion = ({ featureId, projectId, userStoryId } : Props) => {
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
             // console.log("User Story created successfully", response.data);
+            setTasks(response.data)
               toaster.success({
                 title: "Your developer task created successfully",
                 type: "success", // 👈 "type" determines color/indicator

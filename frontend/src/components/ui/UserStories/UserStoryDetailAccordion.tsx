@@ -9,6 +9,12 @@ type Props = {
     projectId: number;
     featureId: number;
     userStoryId: number;
+    tasks: Task[];
+}
+
+export type Task = {
+    name: string;
+    status: string;
 }
 
 const sampleDevTasks= [
@@ -19,9 +25,14 @@ const sampleDevTasks= [
     {name: "Developer Task 5", status: "To-Do"},
 ]
 
-const UserStoryDetailAccordion = ( {name, status, description, projectId, featureId, userStoryId}: Props ) => {
+const UserStoryDetailAccordion = ( {name, status, 
+    description, projectId, 
+    featureId, userStoryId,
+    tasks,
+    }: Props ) => {
 
-      const [isOpen, setIsOpen] = useState(false);
+    const [devTasks, setDevTasks] = useState<Task[]>(tasks || []);
+    const [isOpen, setIsOpen] = useState(false);
     return (
 
         <Box >
@@ -45,7 +56,7 @@ const UserStoryDetailAccordion = ( {name, status, description, projectId, featur
                             <Box pt={4} pb={12}>
                                 {description}
                             </Box>
-                            {sampleDevTasks.map((task) =>{
+                            {devTasks.map((task) =>{
                                 return(
                                     <Box display="flex" justifyContent="space-between" 
                                     borderTop="1px solid" 
@@ -56,7 +67,12 @@ const UserStoryDetailAccordion = ( {name, status, description, projectId, featur
                                 )
                             })}
                         </Text>
-                        <CreateTaskAccordion  featureId={featureId} projectId={projectId} userStoryId={userStoryId}/>
+                        <CreateTaskAccordion  
+                        featureId={featureId} 
+                        projectId={projectId} 
+                        userStoryId={userStoryId}
+                        setTasks={setDevTasks}
+                        />
                         </Accordion.ItemBody>
                 </Accordion.ItemContent>
                 </Accordion.Item>

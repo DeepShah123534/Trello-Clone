@@ -6,9 +6,9 @@ export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserStory, (userStory) => userStory.tasks, { eager: true }) // eager loads user automatically
-  @JoinColumn({ name: 'featureId' })
-  userStory: UserStory
+  @ManyToOne(() => UserStory, (userStory) => userStory.tasks, { eager: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userStoryId' })
+  userStory: UserStory;
 
   @Column()
   name: string;
