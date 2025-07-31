@@ -16,7 +16,6 @@ export type Project = {
 type LoaderData = {
   user:Data;
   projects:Project[];
-
 }
 
 const Projects = () => {

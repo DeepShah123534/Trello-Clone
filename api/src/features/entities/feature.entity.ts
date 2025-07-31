@@ -20,8 +20,8 @@ export class Feature {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ default: 'To Do' })
-  status: string;
+  // @Column({ default: 'To Do' })
+  // status: string;
 
   @OneToMany(() => UserStory, (userStory) => userStory.feature)
   userStories: UserStory[];

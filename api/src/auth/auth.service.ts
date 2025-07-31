@@ -7,6 +7,7 @@ import { MailService } from 'src/mail/mail.service';
 import { ProjectsService } from 'src/projects/projects.service';
 import { FeaturesService } from 'src/features/features.service';
 import { UserStoriesService } from 'src/userStories/userStories.service';
+import { TasksService } from 'src/task/tasks.service';
 
 
 @Injectable()
@@ -16,6 +17,7 @@ export class AuthService {
     private projectsServices: ProjectsService,
     private jwtService: JwtService,
     private featuresService: FeaturesService,
+    private tasksService: TasksService,
     private userStoriesService: UserStoriesService,
     private mailService: MailService,
   ) {}
@@ -195,7 +197,7 @@ export class AuthService {
         console.log("❌ Project or its features not found!");
         throw new UnauthorizedException('project or features not found');
       }
-
+      const features = project.features;
       const feature = project.features.find((feature) => feature.id === featureId);
 
       if (feature && feature.id) {
@@ -203,6 +205,42 @@ export class AuthService {
       } else {
         console.log("❌ Feature not found!");
         throw new UnauthorizedException('feature not found');
+      }
+    }
+
+    async createTask(
+      name: string, 
+      userId: number, 
+      projectId: number, 
+      featureId: number, 
+      userStoryId: number,
+    ) {
+      const projects = await this.projectsServices.getUserProjects(userId);
+      const project = projects.find((project) => project.id === projectId);
+
+      if (!project || !project.features) {
+        console.log("❌ Project or its features not found!");
+        throw new UnauthorizedException('project or features not found');
+      }
+
+      const features = project.features;
+      const feature = project.features.find((feature) => feature.id === featureId);
+
+      if (!feature || !feature.userStories) {
+        console.log("❌ Feature or its user stories not found!");
+        throw new UnauthorizedException('feature or user stories not found');
+      }
+
+      const userStories = feature.userStories;
+      const userStory = userStories.find((story) => story.id === userStoryId)
+
+      console.log('USER STORY', userStory)
+
+      if (userStory && userStory.id) {
+        return await this.tasksService.createTask(name, userStoryId);
+      } else {
+        console.log("❌ user story not found!");
+        throw new UnauthorizedException('user story not found');
       }
     }
 

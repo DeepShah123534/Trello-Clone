@@ -48,6 +48,7 @@ const Project = () => {
                         <Box border="1px solid" flex={1} >
                             <Text textAlign="center" fontSize={20} mt={5}>{column.name}</Text>
                             {features.map ((feature) => {
+                                feature.status = "To Do";
                                 if (column.name === feature.status){
                                     return (
                                     <Box 

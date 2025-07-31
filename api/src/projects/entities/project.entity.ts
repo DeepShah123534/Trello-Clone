@@ -20,9 +20,10 @@ export class Project {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ default: 'To Do' })
-  status: string;
-
   @OneToMany(() => Feature, (feature) => feature.project)
   features: Feature[];
+
+  // @Column({ default: 'To Do' })
+  // status: string;
+
 }

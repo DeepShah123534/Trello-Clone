@@ -18,6 +18,7 @@ export type UserStory = {
     name: string;
     description: string;
     status: string;
+    id: number;
 }
 
 
@@ -62,7 +63,10 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                                  <UserStoryDetailAccordion 
                                     name={`${story.name}`}
                                     status={story.status}
-                                    description={`${story.description} ${index + 1}`}
+                                    description={`${story.description}`}
+                                    featureId={featureId}
+                                    projectId={projectId}
+                                    userStoryId={story.id}
                                  />
                                 )
                             })}

@@ -1,13 +1,25 @@
-import { Accordion, Box, Text } from "@chakra-ui/react"
+import { Accordion, Box, Button, Text } from "@chakra-ui/react"
 import { useState } from "react";
+import CreateTaskAccordion from "../Tasks/CreateTaskAccordion";
 
 type Props = {
     name: string;
     status: string;
     description: string;
+    projectId: number;
+    featureId: number;
+    userStoryId: number;
 }
 
-const UserStoryDetailAccordion = ( {name, status, description}: Props ) => {
+const sampleDevTasks= [
+    {name: "Developer Task 1", status: "To-Do"},
+    {name: "Developer Task 2", status: "To-Do"},
+    {name: "Developer Task 3", status: "To-Do"},
+    {name: "Developer Task 4", status: "To-Do"},
+    {name: "Developer Task 5", status: "To-Do"},
+]
+
+const UserStoryDetailAccordion = ( {name, status, description, projectId, featureId, userStoryId}: Props ) => {
 
       const [isOpen, setIsOpen] = useState(false);
     return (
@@ -20,7 +32,6 @@ const UserStoryDetailAccordion = ( {name, status, description}: Props ) => {
                       display="flex"
                       justifyContent="space-between"
                         _hover={{cursor:"pointer"}}
-                        
                         w="100%">
                               
                         <Text flex={1}  mt={3}>{name}</Text>
@@ -30,8 +41,22 @@ const UserStoryDetailAccordion = ( {name, status, description}: Props ) => {
                 </Accordion.ItemTrigger>
                 <Accordion.ItemContent>
                     <Accordion.ItemBody borderTop="1px solid" >
-                        <Text ml={8} mt={5}>{description}</Text>
-                        
+                        <Text ml={8} mt={5} >
+                            <Box pt={4} pb={12}>
+                                {description}
+                            </Box>
+                            {sampleDevTasks.map((task) =>{
+                                return(
+                                    <Box display="flex" justifyContent="space-between" 
+                                    borderTop="1px solid" 
+                                    alignItems="center" px={4} py={2}>
+                                        <Text> {task.name}</Text>
+                                        <Button mt={2} mr={4}>{task.status}</Button>
+                                    </Box>
+                                )
+                            })}
+                        </Text>
+                        <CreateTaskAccordion  featureId={featureId} projectId={projectId} userStoryId={userStoryId}/>
                         </Accordion.ItemBody>
                 </Accordion.ItemContent>
                 </Accordion.Item>

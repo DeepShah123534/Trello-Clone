@@ -1,6 +1,6 @@
-
 import { Feature } from 'src/features/entities/feature.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Task } from 'src/task/entities/task.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class UserStory {
@@ -20,6 +20,9 @@ export class UserStory {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ default: 'To Do' })
-  status: string;
+  @OneToMany(() => Task, (task) => task.userStory)
+  tasks: Task[];
+
+  // @Column({ default: 'To Do' })
+  // status: string;
 }
