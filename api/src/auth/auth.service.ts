@@ -181,8 +181,10 @@ export class AuthService {
     const projects = await this.projectsServices.getUserProjects(userId);
     const project = projects.find((project) => project.id === projectId);
 
+
     if (project && project.id) {
-      return await this.featuresService.createFeature(name, description, projectId);
+      await this.featuresService.createFeature(name, description, projectId);
+      return await this.projectsServices.getProjectById(projectId)
     } else {
       throw new UnauthorizedException('project not found');
     }
@@ -201,7 +203,8 @@ export class AuthService {
       const feature = project.features.find((feature) => feature.id === featureId);
 
       if (feature && feature.id) {
-        return await this.userStoriesService.createUserStory(name, description, featureId);
+        await this.userStoriesService.createUserStory(name, description, featureId);
+        return await this.projectsServices.getProjectById(projectId);
       } else {
         console.log("❌ Feature not found!");
         throw new UnauthorizedException('feature not found');

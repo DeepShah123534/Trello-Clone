@@ -2,6 +2,7 @@ import { Box, Text, CloseButton, Dialog, Portal } from "@chakra-ui/react"
 import UserStoryDetailAccordion, { Task } from "../UserStories/UserStoryDetailAccordion";
 import CreateUserStoryAccordion from "../UserStories/CreateUserStoryAccordion";
 import { useEffect, useState } from "react";
+import { Project } from "@/Pages/Projects";
 
 
 type Props = {
@@ -11,24 +12,22 @@ type Props = {
     featureDescription: string;
     featureId: number;
     projectId: number;
-    stories: UserStory[];
+    stories: UserStory[]; 
+    setProject: React.Dispatch<React.SetStateAction<Project>>
 }
 
 export type UserStory = {
     name: string;
     description: string;
-    status: string;
     id: number;
     tasks: Task[];
+    completedTask: number;
+    taskCount: number;
 }
 
 
-const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, projectId, stories, }: Props) => {
-        const [userStories, setUserStories] = useState(stories);
-        useEffect(() => {
-            setUserStories(stories)
-        }, [stories])
-
+const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, projectId, stories, setProject}: Props) => {
+    console.log('STORIES: ', stories)
     return (
      
             <Dialog.Root 
@@ -46,8 +45,9 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                         <Dialog.Title>
                             <Box mb={20} >
                                 <Text mb={4} fontSize={20}>
-                                    Feature {featureName}
+                                     {featureName}
                                 </Text>
+
                                 <Text>
                                     {featureDescription}
                                 </Text>
@@ -59,11 +59,11 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                         </Dialog.Header>
                         <Dialog.Body>
                             <Box display="flex" flexDirection="column" gap={5}>
-                            {userStories.map((story, index) => {
+                            {stories.map((story) => {
                                 return (
                                  <UserStoryDetailAccordion 
                                     name={`${story.name}`}
-                                    status={story.status}
+                                    status={`${story.completedTask} / ${story.taskCount}`}
                                     description={`${story.description}`}
                                     featureId={featureId}
                                     projectId={projectId}
@@ -74,10 +74,9 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                                 )
                             })}
                             <CreateUserStoryAccordion 
-                            userStories={userStories} 
-                            setUserStories={setUserStories}
                             featureId={featureId}
                             projectId={projectId}
+                            setProject={setProject}
                             />
                             </Box>
                         </Dialog.Body>

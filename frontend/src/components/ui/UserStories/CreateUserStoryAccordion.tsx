@@ -6,15 +6,20 @@ import axios from "axios";
 import { UserStory } from "../Feature/FeatureModal";
 import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
+import { Project } from "@/Pages/Projects";
 
 type Props = {
-  userStories: UserStory[];
-  setUserStories: React.Dispatch<React.SetStateAction<UserStory[]>>;
+  // userStories: UserStory[];
+  // setUserStories: React.Dispatch<React.SetStateAction<UserStory[]>>;
   featureId: number;
   projectId: number;
+  setProject: React.Dispatch<React.SetStateAction<Project>>
 } 
 
-const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId, projectId } : Props) => {
+const CreateUserStoryAccordion = ({ 
+  // userStories,
+  // setUserStories, 
+  featureId, projectId, setProject, } : Props) => {
 
   const [name, setName] = useState(""); 
   const [description, setDescription] = useState(""); 
@@ -61,13 +66,14 @@ const CreateUserStoryAccordion = ({ userStories, setUserStories, featureId, proj
             },
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
-            // console.log("User Story created successfully", response.data);
+            console.log("PROJECT: ", response.data);
+
               toaster.success({
                 title: "User Story created successfully",
                 type: "success", // 👈 "type" determines color/indicator
                 closable: true,
              })
-            setUserStories (response.data);
+            setProject (response.data);
             setName("");
             setDescription("");
             setSubmitClickedName(false);

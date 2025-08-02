@@ -1,9 +1,10 @@
-import { Box, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { useLoaderData } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
 import CreateFeatureAccordion from "../components/ui/Feature/CreateFeatureAccordion";
 import { useState } from "react";
-import FeatureModal, { UserStory } from "../components/ui/Feature/FeatureModal";
+import  { UserStory } from "../components/ui/Feature/FeatureModal";
+import FeatureBox from "../components/ui/Feature/FeatureBox";
 
 
 export type Feature = {
@@ -24,14 +25,10 @@ const columns = [
 
 
 const Project = () => {
-    const project = useLoaderData() as ProjectType;
-    const [features, setFeatures] = useState<Feature[]>(project.features)
+    const loaderData = useLoaderData() as ProjectType;
 
-    const { open, onOpen, onClose } = useDisclosure();
-    // const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
-    const [selectedFeature, setSelectedFeature] = useState(features[0]);
+    const [project, setProject] = useState(loaderData)
 
-    
     return (
         <Box m={10} >
             <Box mb={20} >
@@ -47,28 +44,11 @@ const Project = () => {
                     return (
                         <Box border="1px solid" flex={1} key={column.name}>
                             <Text textAlign="center" fontSize={20} mt={5}>{column.name}</Text>
-                            {features.map ((feature) => {
+                            {project.features.map ((feature) => {
                                 feature.status = "To Do";
                                 if (column.name === feature.status){
                                     return (
-                                    <Box 
-                                    border="1px solid" p={4} mx={4} mt={4} 
-                                    display="flex"  
-                                    justifyContent="space-between"
-                                    onClick={() => {
-                                        setSelectedFeature(feature);
-                                        setTimeout(() => {
-                                            onOpen();
-                                        }, 0); 
-                                        }}
-                                    _hover={{cursor:"pointer"}}
-                                    key={feature.id}
-                                    >
-                                     
-                                         <Text mt={5}>{feature.name}</Text>
-                                         <Text mt={5}>{feature.completedUserStories} / {feature.userStoriesCount}</Text>
-                                         
-                                    </Box>
+                                    <FeatureBox feature={feature} projectId={project.id} setProject={setProject}/>
                                     
                                     );
                                 } else {
@@ -79,8 +59,8 @@ const Project = () => {
                                 {
                                     column.name === "To Do" && 
                                     < CreateFeatureAccordion 
-                                    features={features} 
-                                    setFeatures={setFeatures}
+                                    features={project.features} 
+                                    setProject={setProject}
                                     projectId={project.id}
                                     />
                                 }
@@ -90,19 +70,6 @@ const Project = () => {
                     );
                 })}
             </Box>
-            {selectedFeature && (
-                <FeatureModal
-                    open={open}
-                    onClose={onClose}
-                    featureName={selectedFeature.name}
-                    featureDescription={
-                    selectedFeature.description || "There is no description..."
-                    }
-                    featureId={selectedFeature.id}
-                    projectId={project.id}
-                    stories={selectedFeature.userStories}
-                />
-            )}
         </Box>
     );
 }
