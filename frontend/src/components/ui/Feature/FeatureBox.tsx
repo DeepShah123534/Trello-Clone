@@ -11,11 +11,12 @@ type Props = {
 
 const FeatureBox = ({feature, projectId ,setProject } : Props) => {
 
-    const { open, onOpen, onClose } = useDisclosure();
+   const { open, onOpen, onClose } = useDisclosure();
+
    return (
     <>
         <Box 
-        border="1px solid" p={4} mx={4} mt={4} 
+        border="1px solid" p={4} mx={4} mt={4}
         display="flex"  
         justifyContent="space-between"
         onClick={onOpen}
@@ -23,8 +24,8 @@ const FeatureBox = ({feature, projectId ,setProject } : Props) => {
         key={feature.id}
         >
          
-             <Text mt={5}>{feature.name}</Text>
-             <Text mt={5}>{feature.completedUserStories} / {feature.userStoriesCount}</Text>
+         <Text mt={5}>{feature.name}</Text>
+         <Text mt={5}>{feature.completedUserStories}/{feature.userStoriesCount}</Text>
              
         </Box>
         <FeatureModal

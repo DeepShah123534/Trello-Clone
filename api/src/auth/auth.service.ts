@@ -240,7 +240,8 @@ export class AuthService {
       console.log('USER STORY', userStory)
 
       if (userStory && userStory.id) {
-        return await this.tasksService.createTask(name, userStoryId);
+        await this.tasksService.createTask(name, userStoryId);
+        return await this.projectsServices.getProjectById(projectId);
       } else {
         console.log("❌ user story not found!");
         throw new UnauthorizedException('user story not found');

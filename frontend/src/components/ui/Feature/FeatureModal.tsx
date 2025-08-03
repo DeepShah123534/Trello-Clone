@@ -1,7 +1,6 @@
 import { Box, Text, CloseButton, Dialog, Portal } from "@chakra-ui/react"
 import UserStoryDetailAccordion, { Task } from "../UserStories/UserStoryDetailAccordion";
 import CreateUserStoryAccordion from "../UserStories/CreateUserStoryAccordion";
-import { useEffect, useState } from "react";
 import { Project } from "@/Pages/Projects";
 
 
@@ -63,13 +62,14 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                                 return (
                                  <UserStoryDetailAccordion 
                                     name={`${story.name}`}
-                                    status={`${story.completedTask} / ${story.taskCount}`}
+                                    status={`${story.completedTask}/${story.taskCount}`}
                                     description={`${story.description}`}
                                     featureId={featureId}
                                     projectId={projectId}
                                     userStoryId={story.id}
                                     tasks={story.tasks}
                                     key={story.id}
+                                    setProject={setProject}
                                  />
                                 )
                             })}

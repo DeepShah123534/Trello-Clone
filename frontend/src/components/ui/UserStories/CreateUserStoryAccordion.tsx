@@ -2,8 +2,7 @@ import { Accordion, Span, Box, Input, Textarea, Button } from "@chakra-ui/react"
 import { FormControl, FormLabel, FormErrorMessage } from '@chakra-ui/form-control';
 import { useState } from "react";
 
-import axios from "axios";
-import { UserStory } from "../Feature/FeatureModal";
+import axios from "axios";    
 import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
 import { Project } from "@/Pages/Projects";
