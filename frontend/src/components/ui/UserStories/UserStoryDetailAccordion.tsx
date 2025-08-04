@@ -39,8 +39,8 @@ const UserStoryDetailAccordion = ( {name, status,
                         w="100%">
                               
                         <Text flex={1}  mt={3}>{name}</Text>
-                        <Text mt={3}>{status}</Text>                                       
-         
+                        <Text mt={3}>{status}</Text>  
+                                                             
                     <Accordion.ItemIndicator />
                 </Accordion.ItemTrigger>
                 <Accordion.ItemContent>
