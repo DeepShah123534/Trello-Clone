@@ -254,7 +254,9 @@ export class AuthService {
       userId: number,
       taskId: number,
     ) {
-      return await this.tasksService.updateTask(field, value, taskId);
+      const projectId =  await this.tasksService.updateTask(field, value,userId, taskId);
+      return await this.projectsServices.getProjectById(projectId);
+      console.log('PROJECT ID', projectId);
     }
 
 }

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Task } from "./entities/task.entity";
@@ -24,14 +24,28 @@ export class TasksService {
     return await this.getUserStoryTasks(userStoryId);
   }
 
-  async updateTask(field: string, value: string, taskId: number) {
-    const taskToUpdate = await this.tasksRepository.findOne({ where: { id: taskId } });
-    if (!taskToUpdate) {
-      throw new Error(`Task with id ${taskId} not found`);
+  async updateTask(field: string, value: string, userId: number, taskId: number) {
+      const taskToUpdate = await this.tasksRepository.findOne({
+        where: {
+          id: taskId,
+          userStory: {
+            feature: {
+              project: {
+                user: { id: userId }
+              }
+            }
+          }
+        },
+        relations: ['userStory', 'userStory.feature', 'userStory.feature.project'],
+      });
+
+    if(taskToUpdate) {
+      taskToUpdate[field] = value;
+      await this.tasksRepository.save(taskToUpdate);
+      return taskToUpdate.userStory.feature.project.id;
+    } else {
+      throw new BadRequestException('YOU CANNOT UPDATE THIS TASK');
     }
-    taskToUpdate[field] = value;
-    const updatedTask = await this.tasksRepository.save(taskToUpdate);
-    console.log('UPDATED TASK: ', updatedTask);
     
   }
 } 

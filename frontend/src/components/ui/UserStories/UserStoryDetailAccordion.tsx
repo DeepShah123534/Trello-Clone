@@ -12,7 +12,7 @@ type Props = {
     featureId: number;
     userStoryId: number;
     tasks: Task[];
-    setProject: React.Dispatch<React.SetStateAction<Project>>
+    setProject: React.Dispatch<React.SetStateAction<Project>>;
 }
 
 export type Task = {
@@ -53,7 +53,7 @@ const UserStoryDetailAccordion = ( {name, status,
                                 {description}
                             </Box>
                             {tasks.map((task) =>{
-                                return <TaskBox task={task}/>
+                                return <TaskBox task={task} setProject={setProject}/>
                             })}
                         </Text>
                         <CreateTaskAccordion  

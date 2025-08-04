@@ -4,13 +4,15 @@ import { useState } from "react";
 import axios from "axios";
 import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
+import { Project } from "@/Pages/Projects";
 
 type Props = {
     task:  Task;
+    setProject: React.Dispatch<React.SetStateAction<Project>>
 } 
 
 
-const TaskBox = ({ task }: Props) => {
+const TaskBox = ({ task, setProject }: Props) => {
 
     const [taskStatus, setTaskStatus] = useState(task.status);
 
@@ -32,9 +34,10 @@ const TaskBox = ({ task }: Props) => {
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
             console.log("Task Updated: ", response.data);
+            setProject(response.data);
             toaster.success({
                     title: `Your task ${field} updated to successfully`,
-                    type: "success", // 👈 "type" determines color/indicator
+                    type: "success", 
                     closable: true,
                 })
             
