@@ -23,4 +23,15 @@ export class TasksService {
 
     return await this.getUserStoryTasks(userStoryId);
   }
+
+  async updateTask(field: string, value: string, taskId: number) {
+    const taskToUpdate = await this.tasksRepository.findOne({ where: { id: taskId } });
+    if (!taskToUpdate) {
+      throw new Error(`Task with id ${taskId} not found`);
+    }
+    taskToUpdate[field] = value;
+    const updatedTask = await this.tasksRepository.save(taskToUpdate);
+    console.log('UPDATED TASK: ', updatedTask);
+    
+  }
 } 
