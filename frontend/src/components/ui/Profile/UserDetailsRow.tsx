@@ -4,6 +4,7 @@ import { Box, IconButton, Input, Text } from "@chakra-ui/react";
 import axios from "axios";
 import { JSX, useState } from "react";
 import { Data } from "../../../Pages/Profile";
+import { toaster } from "../toaster";
 
 
 
@@ -28,12 +29,26 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
 
   const onClickCheck = () => {
     if (field === "Email" && isInvalidEmail(valueState)) {
-      alert("Enter a valid email.");
+      toaster.error({
+              title: "Error",
+              description: "The space cannot be empty.",
+              closable: true,
+    });
+      setValueState(value);
       return;
     }
     else {
         if(valueState === ""){
-            alert("The space cannot be empty")
+            toaster.error({
+              title: "Error",
+              description: "The space cannot be empty.",
+              closable: true,
+            });
+
+            if(field !== "Password"){
+              setValueState(value);
+            }
+            
             return;
         }
     }

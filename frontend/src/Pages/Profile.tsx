@@ -1,4 +1,4 @@
-"use client"
+
 import { Context } from "../App";
 import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
 import {  Box, Text, Button, Avatar} from "@chakra-ui/react";

@@ -117,7 +117,7 @@ const router = createBrowserRouter([
           // If we have a token. we will use it as a bearer token on our request for user data
           if(token) {
             try{
-              const response = await axios.get('http://localhost:3000/auth/user-projects',
+              const response = await axios.get('http://localhost:3000/auth/profile',
               { headers: { Authorization: `Bearer ${token}`} }
             );
             return response.data;

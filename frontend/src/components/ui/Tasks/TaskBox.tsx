@@ -1,4 +1,4 @@
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, Text, IconButton, Input } from "@chakra-ui/react";
 import { Task } from "../UserStories/UserStoryDetailAccordion";
 import { useState } from "react";
 import axios from "axios";
@@ -16,11 +16,34 @@ const TaskBox = ({ task, setProject }: Props) => {
 
     const [taskStatus, setTaskStatus] = useState(task.status);
 
+    const [updateName, setUpdateName] = useState(false);
+
+    const [taskName, setTaksName] = useState(task.name);
+
+  const onChange = (e: any) => {
+    setTaksName(e.target.value);
+  };
+
+  const onClickEdit = () => {
+    setUpdateName(!updateName);
+  };
+
+
     const navigate = useNavigate();
 
     const updateTask = (field: "status" | "name", value: string ) => {
         // console.log('FIELD: ', field)
         // console.log('VALUE: ', value)
+
+        if(taskName === ""){
+            toaster.error({
+                      title: "Error",
+                      description: "Please enter a valid task name.",
+                      closable: true,
+                    });
+            setTaksName(task.name);
+            return;
+        }
 
 
         const token = localStorage.getItem("token");
@@ -35,6 +58,8 @@ const TaskBox = ({ task, setProject }: Props) => {
           ).then((response) => {
             console.log("Task Updated: ", response.data);
             setProject(response.data);
+            setUpdateName(false);
+
             toaster.success({
                     title: `Your task ${field} updated to successfully`,
                     type: "success", 
@@ -63,6 +88,8 @@ const TaskBox = ({ task, setProject }: Props) => {
     };
 
     const updateTaskStatus = (status: 'To Do' | 'In Progress' | 'Done!') => {
+
+        
         setTaskStatus(status);
     }
 
@@ -90,10 +117,35 @@ const TaskBox = ({ task, setProject }: Props) => {
         borderTop="1px solid" 
         alignItems="center" 
         px={4} py={2} 
+        gap={5}
         key={task.name}>
-            <Text> {task.name}</Text>
+            <Box flex={1}>
+            {updateName ? (
+                <Input
+                  
+                  h="32px"
+                  value={taskName}
+                  onChange={onChange}
+                  type="text"
+                />
+              ) : (
+                <Text flex={1}> {task.name}</Text>
+              )}
+              </Box>
+              <IconButton
+              
+                aria-label="Edit"
+                variant="outline"
+                size="md"
+                onClick={updateName ? 
+                    () => { updateTask ("name", taskName)} 
+                    : onClickEdit}
+              >
+                {updateName ? "✔" : "✏️"}
+              </IconButton>
+            
             <Button 
-            mt={2} mr={4}
+            w="118px"
             onClick={toggleTaskStatus}
             >
                 {taskStatus}
