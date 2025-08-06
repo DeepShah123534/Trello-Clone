@@ -59,8 +59,6 @@ const CreateFeatureAccordion = ({ features, setProject, projectId } : Props) => 
             setSubmitClickedName(false);
           }).catch ((error) => {
 
-            console.log('ERROR', error);
-
                 if (error.response.data.message === 'Unauthorized') {
                     toaster.error({
                       title: "Error",

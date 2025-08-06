@@ -4,20 +4,17 @@ import { useState } from "react";
 import axios from "axios";
 import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
-import { Project } from "@/Pages/Projects";
+
 
 type Props = {
     task:  Task;
-    setProject: React.Dispatch<React.SetStateAction<Project>>
+    setStoryStatus: React.Dispatch<React.SetStateAction<string>>;
 } 
 
-
-const TaskBox = ({ task, setProject }: Props) => {
+const TaskBox = ({ task, setStoryStatus }: Props) => {
 
     const [taskStatus, setTaskStatus] = useState(task.status);
-
     const [updateName, setUpdateName] = useState(false);
-
     const [taskName, setTaksName] = useState(task.name);
 
   const onChange = (e: any) => {
@@ -32,8 +29,6 @@ const TaskBox = ({ task, setProject }: Props) => {
     const navigate = useNavigate();
 
     const updateTask = (field: "status" | "name", value: string ) => {
-        // console.log('FIELD: ', field)
-        // console.log('VALUE: ', value)
 
         if(taskName === ""){
             toaster.error({
@@ -56,8 +51,8 @@ const TaskBox = ({ task, setProject }: Props) => {
             },
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
-            console.log("Task Updated: ", response.data);
-            setProject(response.data);
+            
+            setStoryStatus(response.data);
             setUpdateName(false);
 
             toaster.success({
@@ -123,7 +118,7 @@ const TaskBox = ({ task, setProject }: Props) => {
             {updateName ? (
                 <Input
                   
-                  h="32px"
+                  h="40px"
                   value={taskName}
                   onChange={onChange}
                   type="text"

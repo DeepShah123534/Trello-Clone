@@ -26,7 +26,7 @@ export type UserStory = {
 
 
 const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, projectId, stories, setProject}: Props) => {
-    console.log('STORIES: ', stories)
+
     return (
      
             <Dialog.Root 

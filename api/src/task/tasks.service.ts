@@ -36,13 +36,16 @@ export class TasksService {
             }
           }
         },
-        relations: ['userStory', 'userStory.feature', 'userStory.feature.project'],
+        relations: [
+          'userStory'
+        ],
       });
 
     if(taskToUpdate) {
       taskToUpdate[field] = value;
       await this.tasksRepository.save(taskToUpdate);
-      return taskToUpdate.userStory.feature.project.id;
+      console.log('USER STORY', taskToUpdate.userStory);
+      return taskToUpdate.userStory.id;
     } else {
       throw new BadRequestException('YOU CANNOT UPDATE THIS TASK');
     }

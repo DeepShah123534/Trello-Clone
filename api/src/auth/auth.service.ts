@@ -248,15 +248,25 @@ export class AuthService {
       }
     }
 
+    async updateUserStory(
+      field: string, 
+      value: string, 
+      userId: number,
+      userStoryId: number,
+    ) {
+      const projectId = await this.userStoriesService.updateUserStory(field, value, userId, userStoryId);
+      return await this.userStoriesService.getUserStoryById(projectId);
+    } 
+
     async updateTask(
       field: string, 
       value: string, 
       userId: number,
       taskId: number,
     ) {
-      const projectId =  await this.tasksService.updateTask(field, value,userId, taskId);
-      return await this.projectsServices.getProjectById(projectId);
-      console.log('PROJECT ID', projectId);
+      const userStoryId =  await this.tasksService.updateTask(field, value,userId, taskId);
+      return await this.userStoriesService.getUserStoryById(userStoryId);
+    
     }
 
 }

@@ -33,8 +33,6 @@ const ResetPassword = () => {
     };
 
     const onSubmit = () => {
-        console.log('Password: ', password);
-        console.log('Second Password: ', secondPassword);
 
         setSubmitPassword(true);
         setSubmitSecondPassword(true);

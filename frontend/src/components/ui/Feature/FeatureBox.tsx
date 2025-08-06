@@ -2,6 +2,9 @@ import { Feature } from "@/Pages/Project";
 import { Box, Text, useDisclosure } from "@chakra-ui/react";
 import FeatureModal from "./FeatureModal";
 import { Project } from "@/Pages/Projects";
+import axios from "axios";
+import { toaster } from "../toaster";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
     feature: Feature;
@@ -12,6 +15,36 @@ type Props = {
 const FeatureBox = ({feature, projectId ,setProject } : Props) => {
 
    const { open, onOpen, onClose } = useDisclosure();
+   const navigate = useNavigate();
+
+   const onCloseModal = () => {
+
+    const token = localStorage.getItem("token");
+     axios.get(`http://localhost:3000/auth/project/${projectId}`,
+              { headers: { Authorization: `Bearer ${token}`} 
+            }).then((response) => {
+                setProject(response.data);
+                onClose();
+            }).catch ((error) => {
+            
+            
+                            if (error.response.data.message === 'Unauthorized') {
+                                toaster.error({
+                                  title: "Error",
+                                  description: "Your session has expired log in again.",
+                                  closable: true,
+                                });
+                            
+                                navigate('/log-in')
+                            } else {
+                              toaster.error({
+                                  title: "Error",
+                                  description: "There was an error updating the task. Please try again.",
+                                  closable: true,
+                                });
+                            }
+                      })
+   }
 
    return (
     <>
@@ -30,7 +63,7 @@ const FeatureBox = ({feature, projectId ,setProject } : Props) => {
         </Box>
         <FeatureModal
             open={open}
-            onClose={onClose}
+            onClose={onCloseModal}
             featureName={feature.name}
             featureDescription={
             feature.description || "There is no description..."

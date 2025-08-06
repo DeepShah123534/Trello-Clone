@@ -135,6 +135,19 @@ export class UpdateTaskDto {
   taskId: number;
 }
 
+export class UpdateUserStoryDto {
+
+  @IsNotEmpty()
+  field: string;
+
+  @IsNotEmpty()
+  @Transform((params) => sanitizeHtml(params.value))
+  value: string;
+
+  @IsNotEmpty()
+  userStoryId: number;
+}
+
 
 @Controller('auth')
 export class AuthController {
@@ -198,7 +211,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('create-user-story')
   createUserStory(@Body() userStoryDto: UserStoryDto, @Request() req) {
-    console.log('user story dto: ', userStoryDto, req.user.sub )
     return this.authService.createUserStory(
       userStoryDto.name,
       userStoryDto.description,
@@ -209,9 +221,22 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @Post('update-user-story')
+  updateUserStory(@Body() updateUserStoryDto: UpdateUserStoryDto, @Request() req) {
+    return this.authService.updateUserStory(
+      updateUserStoryDto.field,
+      updateUserStoryDto.value,
+      req.user.sub,
+      updateUserStoryDto.userStoryId,
+    )
+    // console.log("USER STORY DTO: ", updateUserStoryDto);
+    // console.log("USER ID: ", req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
   @Post('create-task')
   createTask(@Body() taskDto: TaskDto, @Request() req) {
-    console.log('TASK DTO', taskDto, req.user.sub)
+
     return this.authService.createTask(
       taskDto.name,
       req.user.sub,
