@@ -1,4 +1,4 @@
-import { Accordion, Box, Button, IconButton, Input, Text } from "@chakra-ui/react"
+import { Accordion, Box, IconButton, Input, Text } from "@chakra-ui/react"
 import { useState } from "react";
 import CreateTaskAccordion from "../Tasks/CreateTaskAccordion";
 import { Project } from "@/Pages/Projects";
@@ -6,7 +6,6 @@ import TaskBox from "../Tasks/TaskBox";
 import { toaster } from "../toaster";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { on } from "events";
 
 type Props = {
     name: string;
@@ -18,6 +17,8 @@ type Props = {
     tasks: Task[];
     setProject: React.Dispatch<React.SetStateAction<Project>>;
 }
+
+
 
 export type Task = {
     name: string;
@@ -33,20 +34,31 @@ const UserStoryDetailAccordion = ( {name, status,
     const [storyStatus, setStoryStatus] = useState(status);
     const [updateStoryName, setUpdateStoryName] = useState(false);
     const [storyName, setStoryName] = useState(name)
+    const [updateStoryDescription, setUpdateStoryDescription] = useState(false);
+
+    const [storyDescription, setStoryDescription] = useState(description);
     
     const [isOpen, setIsOpen] = useState(false);
 
     const navigate = useNavigate();
 
-    const onChange = (e: any) => {
+    const onChangeName = (e: any) => {
         setStoryName(e.target.value);
     };
 
-    const onClickEdit = () => {
+    const onChangeDescription = (e: any) => {
+        setStoryDescription(e.target.value);
+    };
+
+    const onClickEditName = () => {
         setUpdateStoryName(!updateStoryName);
     };
 
-        const updateStory = (field: "name" | "description", value: string ) => {
+    const onClickEditDescription = () => {
+        setUpdateStoryDescription(!updateStoryDescription);
+    };
+
+    const updateStory = (field: "name" | "description", value: string ) => {
 
         if(storyName === ""){
             toaster.error({
@@ -68,10 +80,12 @@ const UserStoryDetailAccordion = ( {name, status,
               userStoryId,
             },
             { headers: { Authorization: `Bearer ${token}`} }
+            
           ).then((response) => {
             
             setProject(response.data);
             setUpdateStoryName(false);
+            setUpdateStoryDescription(false);
 
             toaster.success({
                     title: `Your user story ${field} updated to successfully`,
@@ -109,7 +123,7 @@ const UserStoryDetailAccordion = ( {name, status,
             mr={4}
             h="40px"
             value={storyName}
-            onChange={onChange}
+            onChange={onChangeName}
             type="text"
             
           />
@@ -146,7 +160,7 @@ const UserStoryDetailAccordion = ( {name, status,
                             aria-label="Edit"
                             variant="outline"
                             size="md"
-                            onClick={onClickEdit }
+                            onClick={onClickEditName }
                           >
                             {updateStoryName ? "✔" : "✏️"}
                             
@@ -160,9 +174,44 @@ const UserStoryDetailAccordion = ( {name, status,
                 <Accordion.ItemContent>
                     <Accordion.ItemBody borderTop="1px solid" >
                         <Text ml={8} mt={5} >
-                            <Box pt={4} pb={12}>
+                          <Box display="flex" >
+                            { updateStoryDescription ?  
+                            (
+                              <Box flex={1} >
+                                <Input
+                                    mr={4}
+                                    gap={4}
+                                    h="40px"
+                                    value={storyDescription}
+                                    onChange={onChangeDescription}
+                                    type="text"
+
+                                  />
+                                </Box>
+                            ) : 
+                            ( <Box  pb={12} flex={1}>
                                 {description}
+                            </Box>)}
+                            <Box ml={10} display="flex"  >
+                              <IconButton
+                             
+                            aria-label="Edit"
+                            variant="outline"
+                            size="md"
+                            onClick={
+                              updateStoryDescription ? () =>{ updateStory("description", storyDescription) } 
+                            : onClickEditDescription }
+                            
+                          >
+                            {updateStoryDescription ? "✔" : "✏️"}
+                            
+                          </IconButton>
                             </Box>
+                             
+
+                          </Box>
+                          
+                            
                             {tasks.map((task) =>{
                                 return <TaskBox task={task}  setStoryStatus={setStoryStatus}/>
                             })}
@@ -182,8 +231,6 @@ const UserStoryDetailAccordion = ( {name, status,
       </>
   );
 }
-
-
 
 export default UserStoryDetailAccordion;
 

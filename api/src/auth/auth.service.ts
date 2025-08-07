@@ -255,7 +255,7 @@ export class AuthService {
       userStoryId: number,
     ) {
       const projectId = await this.userStoriesService.updateUserStory(field, value, userId, userStoryId);
-      return await this.userStoriesService.getUserStoryById(projectId);
+      return await this.projectsServices.getProjectById(projectId);
     } 
 
     async updateTask(
@@ -269,4 +269,15 @@ export class AuthService {
     
     }
 
+    async updateFeature(
+      field: string, 
+      value: string, 
+      userId: number,
+      featureId: number,
+    ) {
+      const projectId = await this.featuresService.updateFeature(field, value, userId, featureId);
+      return await this.projectsServices.getProjectById(projectId);
+    } 
+
+   
 }

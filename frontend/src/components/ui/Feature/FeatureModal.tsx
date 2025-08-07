@@ -1,7 +1,11 @@
-import { Box, Text, CloseButton, Dialog, Portal } from "@chakra-ui/react"
+import { Box, Text, CloseButton, Dialog, Portal, Input, IconButton } from "@chakra-ui/react"
 import UserStoryDetailAccordion, { Task } from "../UserStories/UserStoryDetailAccordion";
 import CreateUserStoryAccordion from "../UserStories/CreateUserStoryAccordion";
 import { Project } from "@/Pages/Projects";
+import { useState } from "react";
+import { toaster } from "../toaster";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 type Props = {
@@ -26,6 +30,86 @@ export type UserStory = {
 
 
 const FeatureModal = ({ open, onClose, featureName, featureDescription, featureId, projectId, stories, setProject}: Props) => {
+    const [updateFeatureName, setUpdateFeatureName] = useState(false);
+
+    const [name, setName] = useState(featureName);
+
+    const editName = () => {
+        setUpdateFeatureName(!updateFeatureName);
+    }
+
+    const editDescription = () => {
+        setUpdateFeatureDescription(!updateFeatureDescription);
+    }
+
+    const [description, setDescription] = useState(featureDescription);
+    const [updateFeatureDescription, setUpdateFeatureDescription] = useState(false);
+
+    const navigate = useNavigate();
+
+    const onChangeName = (e: any) => {
+        setName(e.target.value);
+    };
+
+    const onChangeDescription = (e: any) => {
+        setDescription(e.target.value);
+    };
+
+    const updateFeature = (field: "name" | "description", value: string ) => {
+
+        if(name === ""){
+            toaster.error({
+              title: "Error",
+              description: "Please enter a valid feature name.",
+              closable: true,
+            });
+            setName(featureName);
+            return;
+        }
+
+
+        const token = localStorage.getItem("token");
+
+          axios.post('http://localhost:3000/auth/update-feature',
+            {
+              field,
+              value,
+              featureId,
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+            
+          ).then((response) => {
+            
+            setProject(response.data);
+            setUpdateFeatureName(false);
+            setUpdateFeatureDescription(false);
+
+            toaster.success({
+                    title: `Your feature ${field} updated to successfully`,
+                    type: "success", 
+                    closable: true,
+                })
+            
+          }).catch ((error) => {
+
+
+                if (error.response.data.message === 'Unauthorized') {
+                    toaster.error({
+                      title: "Error",
+                      description: "Your session has expired log in again.",
+                      closable: true,
+                    });
+                
+                    navigate('/log-in')
+                } else {
+                  toaster.error({
+                      title: "Error",
+                      description: "There was an error updating the feature. Please try again.",
+                      closable: true,
+                    });
+                }
+          })
+    };
 
     return (
      
@@ -43,13 +127,85 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                         <Dialog.Header>
                         <Dialog.Title>
                             <Box mb={20} >
-                                <Text mb={4} fontSize={20}>
+                                <Box display="flex" mb={4} alignItems="center" gap={3}>
+                            {   
+                                updateFeatureName ? (
+                                    <Box  width="1000px" >
+                                        <Input
+                                            w="100%"
+                                            h="40px"
+                                            value={name}
+                                            onChange={onChangeName}
+                                            type="text"
+                                            size="xl"
+                                            
+                                          />
+                                    </Box>
+                                    ) :
+                                    ( 
+                                    <Text fontSize={20}>
                                      {featureName}
-                                </Text>
+                                    </Text>
+                                    )
+                            }
+                                <IconButton
+                                                                      
+                                   aria-label="Edit-Name"
+                                   variant="outline"
+                                   size="md"
+                                   onClick={
+                                    updateFeatureName ?
+                                    () => {
+                                        updateFeature("name", name)
+                                    } :
+                                    editName
+                                   }
+                                 >
+                                   {updateFeatureName ? "✔" : "✏️"}
+                                   
+                                 </IconButton>
 
+                                </Box>
+
+                                <Box display="flex" mb={4} alignItems="center" justifyContent="space-between" gap={5}>
+                                    { updateFeatureDescription ? 
+                                (
+                                    <Box  width="1000px">
+                                        <Input
+                                           
+                                            h="40px"
+                                            value={description}
+                                            onChange={onChangeDescription}
+                                            type="text"
+                                            size="lg"
+                                            
+                                            
+                                          />
+                                    </Box>
+                                ) : (
                                 <Text>
                                     {featureDescription}
                                 </Text>
+                                )}    
+                                <IconButton
+                                   mr={4}                          
+                                   aria-label="Edit-Description"
+                                   variant="outline"
+                                   size="md"
+                                   onClick={
+                                    updateFeatureDescription ?
+                                    () => {
+                                        updateFeature("description", description)
+                                    } :
+                                    editDescription
+                                   }
+                                 >
+                                   {updateFeatureDescription ? "✔" : "✏️"}
+                                   
+                                 </IconButton>
+
+                                </Box>
+                                    
                             </Box>
                         </Dialog.Title>
                         <Dialog.CloseTrigger asChild>

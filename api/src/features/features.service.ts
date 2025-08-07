@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Feature } from "./entities/feature.entity";
@@ -24,4 +24,30 @@ export class FeaturesService {
     });
     return await this.getProjectFeatures(projectId);
   }
+
+  async updateFeature(field: string, value: string, userId: number, featureId: number) {
+          const featureToUpdate = await this.featuresRepository.findOne({
+            where: {
+              id: featureId,
+                  project: {
+                    user: { id: userId }
+                  }
+            },
+            relations: [ 'project'],
+          });
+  
+          console.log('STORY TO UPDATE', featureToUpdate)
+    
+        if(featureToUpdate) {
+          featureToUpdate[field] = value;
+          const updatedFeature = await this.featuresRepository.save(featureToUpdate);
+  
+          console.log('UPDATED STORY', updatedFeature)
+          return updatedFeature.project.id;
+          
+        } else {
+          throw new BadRequestException('YOU CANNOT UPDATE THIS FEATURE');
+        }
+        
+      }
 } 

@@ -46,10 +46,14 @@ const Project = () => {
                     return (
                         <Box border="1px solid" flex={1} key={column.name}>
                             <Text textAlign="center" fontSize={20} mt={5}>{column.name}</Text>
-                            {project?.features?.map  ((feature) => {
+                            {project.features.map  ((feature) => {
                                 if (column.name === feature.status){
                                     return (
-                                    <FeatureBox key={feature.id} feature={feature} projectId={project.id} setProject={setProject}/>
+                                    <FeatureBox 
+                                    key={feature.id}
+                                     feature={feature} 
+                                     projectId={project.id} 
+                                     setProject={setProject}/>
                                     
                                     );
                                 } else {
@@ -64,6 +68,7 @@ const Project = () => {
                                     setProject={setProject}
                                     projectId={project.id}
                                     />
+
                                 }
                             </Box>
                             
