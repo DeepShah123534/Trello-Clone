@@ -28,22 +28,22 @@ const FeatureBox = ({feature, projectId ,setProject } : Props) => {
             }).catch ((error) => {
             
             
-                            if (error.response.data.message === 'Unauthorized') {
-                                toaster.error({
-                                  title: "Error",
-                                  description: "Your session has expired log in again.",
-                                  closable: true,
-                                });
+                    if (error.response.data.message === 'Unauthorized') {
+                        toaster.error({
+                          title: "Error",
+                          description: "Your session has expired log in again.",
+                          closable: true,
+                        });
                             
-                                navigate('/log-in')
-                            } else {
-                              toaster.error({
-                                  title: "Error",
-                                  description: "There was an error updating the task. Please try again.",
-                                  closable: true,
-                                });
-                            }
-                      })
+                    navigate('/log-in')
+                    } else {
+                        toaster.error({
+                          title: "Error",
+                          description: "There was an error updating the task. Please try again.",
+                          closable: true,
+                        });
+                    }
+                })
    }
 
    return (

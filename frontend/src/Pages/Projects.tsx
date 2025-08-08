@@ -8,7 +8,7 @@ import { Feature } from "./Project";
 export type Project = {
     id: number;
     name: string;
-    description?: string;
+    description: string;
     status: string;
     features: Feature[];
 }

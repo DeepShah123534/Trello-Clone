@@ -1,10 +1,12 @@
-import { Box, Text } from "@chakra-ui/react";
-import { useLoaderData } from "react-router-dom";
+import { Box, IconButton, Input, Text } from "@chakra-ui/react";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
 import CreateFeatureAccordion from "../components/ui/Feature/CreateFeatureAccordion";
 import { useState } from "react";
 import  { UserStory } from "../components/ui/Feature/FeatureModal";
 import FeatureBox from "../components/ui/Feature/FeatureBox";
+import { toaster } from "../components/ui/toaster";
+import axios from "axios";
 
 
 export type Feature = {
@@ -26,20 +28,170 @@ const columns = [
 
 const Project = () => {
     const loaderData = useLoaderData() as ProjectType;
-
     const [project, setProject] = useState(loaderData)
 
-    console.log("Project: ", project);
+    const navigate = useNavigate();
+
+    const [projectName, setProjectName] = useState(project.name);
+    const [projectDescription, setProjectDescription] = useState(project.description);
+
+    const [updateProjectName, setUpdateProjectName] = useState(false);
+    const [updateProjectDescription, setUpdateProjectDescription] = useState(false);
+
+    const editName = () => {
+        setUpdateProjectName(!updateProjectName);
+    }
+
+    const onChangeName = (e: any) => {
+        setProjectName(e.target.value);
+    };
+
+     const editDescription = () => {
+        setUpdateProjectDescription(!updateProjectDescription);
+    }
+
+    const onChangeDescription = (e: any) => {
+        setProjectDescription(e.target.value);
+    };
+
+    const updateProject = (field: "name" | "description", value: string | undefined) => {
+
+        if(projectName === ""){
+            toaster.error({
+              title: "Error",
+              description: "Please enter a valid project name.",
+              closable: true,
+            });
+            setProjectName(project.name);
+            return;
+        }
+
+
+        const token = localStorage.getItem("token");
+
+          axios.post('http://localhost:3000/auth/update-project',
+            {
+              field,
+              value,
+              projectId: project.id,
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+            
+          ).then((response) => {
+            
+            setProject(response.data);
+            setUpdateProjectName(false);
+            setUpdateProjectDescription(false);
+
+            toaster.success({
+                    title: `Your project ${field} updated to successfully`,
+                    type: "success", 
+                    closable: true,
+                })
+            
+          }).catch ((error) => {
+
+
+                if (error.response.data.message === 'Unauthorized') {
+                    toaster.error({
+                      title: "Error",
+                      description: "Your session has expired log in again.",
+                      closable: true,
+                    });
+                
+                    navigate('/log-in')
+                } else {
+                  toaster.error({
+                      title: "Error",
+                      description: "There was an error updating the project. Please try again.",
+                      closable: true,
+                    });
+                }
+          })
+    };
 
     return (
         <Box m={10} >
             <Box mb={20} >
-            <Text mb={4} fontSize={20}>
+            <Box display="flex" mb={4} alignItems="center" gap={3}>
+            { updateProjectName ? (
+                <Box  width="1000px" flex={1} mr={4} >
+                    <Input
+                        w="100%"
+                        h="40px"
+                        value={projectName}
+                        onChange={onChangeName}
+                        type="text"
+                        size="xl"
+                        
+                      />
+                </Box>
+            ) : (
+            <Text mr={4} fontSize={20}>
                 {project.name}
             </Text>
-            <Text>
+            )
+            }    
+            <IconButton
+                                                                                  
+               aria-label="Edit-Name"
+               variant="outline"
+               size="md"
+               onClick={
+                updateProjectName ?
+                () => {
+                    updateProject("name", projectName)
+                } :
+                editName
+               }
+             >
+               {updateProjectName ? "✔" : "✏️"}
+               
+             </IconButton>
+            </Box>
+
+        <Box display="flex" mb={4} alignItems="center" gap={3}>
+
+            { updateProjectDescription? (
+                <Box  width="1000px" flex={1} mr={4} >
+                    <Input
+                        w="100%"
+                        h="40px"
+                        value={projectDescription}
+                        onChange={onChangeDescription}
+                        type="text"
+                        size="lg"
+                        
+                      />
+                </Box>
+            ) : (
+            <Text mr={4} fontSize={20}>
                 {project.description || "There is no Project Description. "}
             </Text>
+            )
+
+            }
+            <IconButton
+                                                                                  
+               aria-label="Edit-Description"
+               variant="outline"
+               size="md"
+               onClick={
+                updateProjectDescription?
+                () => {
+                    updateProject("description", projectDescription)
+                } :
+                editDescription
+               }
+             >
+               {updateProjectDescription ? "✔" : "✏️"}
+               
+             </IconButton>
+
+        </Box>
+            
+
+
             </Box>
             <Box display="flex" gap={10} >
                 {columns.map((column) => {

@@ -25,4 +25,5 @@ export class Feature {
 
   @OneToMany(() => UserStory, (userStory) => userStory.feature)
   userStories: UserStory[];
+  feature: any;
 } 

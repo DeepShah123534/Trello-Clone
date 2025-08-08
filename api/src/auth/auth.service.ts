@@ -279,5 +279,12 @@ export class AuthService {
       return await this.projectsServices.getProjectById(projectId);
     } 
 
-   
+    async updateProject(
+      field: string, 
+      value: string, 
+      userId: number,
+      projectId: number,
+    ) {
+      return await this.projectsServices.updateProject(field, value, userId, projectId);
+    } 
 }
