@@ -1,5 +1,5 @@
 import { Accordion, Box, IconButton, Input, Text } from "@chakra-ui/react"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateTaskAccordion from "../Tasks/CreateTaskAccordion";
 import { Project } from "@/Pages/Projects";
 import TaskBox from "../Tasks/TaskBox";
@@ -41,6 +41,12 @@ const UserStoryDetailAccordion = ( {name, status,
     const [isOpen, setIsOpen] = useState(false);
 
     const navigate = useNavigate();
+
+
+    useEffect(() => {
+      
+      setStoryStatus(status);
+    },[status])
 
     const onChangeName = (e: any) => {
         setStoryName(e.target.value);
