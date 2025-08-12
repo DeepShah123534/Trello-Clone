@@ -1,4 +1,4 @@
-import { Accordion, Box, IconButton, Input, Text } from "@chakra-ui/react"
+import { Accordion, Box, Button, IconButton, Input, Text, useDisclosure } from "@chakra-ui/react"
 import { useEffect, useState } from "react";
 import CreateTaskAccordion from "../Tasks/CreateTaskAccordion";
 import { Project } from "@/Pages/Projects";
@@ -6,6 +6,9 @@ import TaskBox from "../Tasks/TaskBox";
 import { toaster } from "../toaster";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import DeleteModal from "../DeleteModal";
+
+
 
 type Props = {
     name: string;
@@ -17,7 +20,6 @@ type Props = {
     tasks: Task[];
     setProject: React.Dispatch<React.SetStateAction<Project>>;
 }
-
 
 
 export type Task = {
@@ -40,13 +42,19 @@ const UserStoryDetailAccordion = ( {name, status,
     
     const [isOpen, setIsOpen] = useState(false);
 
+    const { open, onOpen, onClose } = useDisclosure();  
+    const [taskList, setTaskList] = useState(tasks)
+
+    
+
     const navigate = useNavigate();
 
 
     useEffect(() => {
       
       setStoryStatus(status);
-    },[status])
+      setTaskList(tasks)
+    },[status, tasks])
 
     const onChangeName = (e: any) => {
         setStoryName(e.target.value);
@@ -120,6 +128,47 @@ const UserStoryDetailAccordion = ( {name, status,
           })
     };
 
+    const deleteStory = () => {
+      const token = localStorage.getItem("token");
+
+          axios.post('http://localhost:3000/auth/delete-user-story',
+            {
+              userStoryId,
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+          ).then((response) => {
+            setProject(response.data);
+
+           
+
+            toaster.success({
+                    title: `Your user story deleted successfully`,
+                    type: "success", 
+                    closable: true,
+                })
+            
+          }).catch ((error) => {
+
+
+                if (error.response.data.message === 'Unauthorized') {
+                    toaster.error({
+                      title: "Error",
+                      description: "Your session has expired log in again.",
+                      closable: true,
+                    });
+                
+                    navigate('/log-in')
+                } else {
+                  toaster.error({
+                      title: "Error",
+                      description: "There was an error deleting the user story. Please try again.",
+                      closable: true,
+                    });
+                }
+          })
+         
+    }
+
    return (
    <>
    {updateStoryName ?  
@@ -149,7 +198,8 @@ const UserStoryDetailAccordion = ( {name, status,
                 {updateStoryName ? "✔" : "✏️"}
                   
             </IconButton>
-            <Text ml={3} >{storyStatus}</Text> 
+            <Text mr={4} >{storyStatus}</Text> 
+            <Button variant="outline"  onClick={onOpen}  mr={4}> Delete </Button>
       </Box>:
         <Box >
             <Accordion.Root collapsible index={isOpen ? [0] : [1]} border="1px solid"  >
@@ -161,8 +211,9 @@ const UserStoryDetailAccordion = ( {name, status,
                         w="100%">
 
                         <Text flex={1} >{name}</Text>
+                        
                         <IconButton
-                                      
+                            mr={2}
                             aria-label="Edit"
                             variant="outline"
                             size="md"
@@ -173,13 +224,16 @@ const UserStoryDetailAccordion = ( {name, status,
                           </IconButton>
                           
 
-                        <Text mt={3}>{storyStatus}</Text> 
+                        <Text mr={2}>{storyStatus}</Text> 
+
+                        <Button variant="outline"  onClick={onOpen}  mr={4}> Delete </Button>
                                                
-                    <Accordion.ItemIndicator />
+                    <Accordion.ItemIndicator /> 
                 </Accordion.ItemTrigger>
                 <Accordion.ItemContent>
                     <Accordion.ItemBody borderTop="1px solid" >
                         <Text ml={8} mt={5} >
+                                    
                           <Box display="flex" >
                             { updateStoryDescription ?  
                             (
@@ -213,13 +267,11 @@ const UserStoryDetailAccordion = ( {name, status,
                             
                           </IconButton>
                             </Box>
-                             
-
                           </Box>
                           
                             
-                            {tasks.map((task) =>{
-                                return <TaskBox task={task}  setStoryStatus={setStoryStatus}/>
+                            {taskList.map((task) =>{
+                                return <TaskBox  task={task}  setStoryStatus={setStoryStatus} setTaskList={setTaskList}/>
                             })}
                         </Text>
                         <CreateTaskAccordion  
@@ -234,80 +286,10 @@ const UserStoryDetailAccordion = ( {name, status,
             </Accordion.Root>
         </Box>
       }
+      <DeleteModal isOpen={open} onClose={onClose} deleteItem={deleteStory} itemType={"user story"}/>
       </>
   );
 }
 
 export default UserStoryDetailAccordion;
 
-
-// <Box>
-  //   <Accordion.Root
-  //     collapsible
-  //     index={isOpen ? [0] : [1]}
-  //     onValueChange={(value: string[]) => setIsOpen(value.length > 0)} // reliable state control
-  //     border="1px solid"
-  //   >
-  //     <Accordion.Item>
-  //       <Accordion.ItemTrigger
-  //         p={4}
-  //         mx={4}
-  //         display="flex"
-  //         justifyContent="space-between"
-  //         _hover={{ cursor: "pointer" }}
-  //         w="100%"
-  //       >
-  //         {updateStoryName ? (
-  //           <Input
-  //             h="40px"
-  //             mr={4}
-  //             value={storyName}
-  //             onChange={onChange}
-  //             type="text"
-  //             onClick={(e) => e.stopPropagation()} // prevent closing accordion
-  //             onFocus={(e) => e.stopPropagation()} // prevent closing on focus
-
-  //           />
-  //         ) : (
-  //           <Text flex={1} mt={3}>{name}</Text>
-  //         )}
-
-  //         <IconButton
-  //           aria-label="Edit"
-  //           variant="outline"
-  //           size="md"
-  //           onClick={(e) => {
-  //             e.stopPropagation(); // prevent accordion toggle
-  //             updateStoryName
-  //               ? updateStory("name", storyName)
-  //               : onClickEdit();
-  //           }}
-  //         >
-  //           {updateStoryName ? "✔" : "✏️"}
-  //         </IconButton>
-
-  //         <Text >{storyStatus}</Text>
-
-  //         <Accordion.ItemIndicator />
-  //       </Accordion.ItemTrigger>
-
-  //       <Accordion.ItemContent>
-  //         <Accordion.ItemBody borderTop="1px solid">
-  //           <Text ml={8} mt={5}>
-  //             <Box pt={4} pb={12}>{description}</Box>
-  //             {tasks.map((task) => (
-  //               <TaskBox task={task} setStoryStatus={setStoryStatus} />
-  //             ))}
-  //           </Text>
-
-  //           <CreateTaskAccordion
-  //             featureId={featureId}
-  //             projectId={projectId}
-  //             userStoryId={userStoryId}
-  //             setProject={setProject}
-  //           />
-  //         </Accordion.ItemBody>
-  //       </Accordion.ItemContent>
-  //     </Accordion.Item>
-  //   </Accordion.Root>
-  // </Box>

@@ -268,6 +268,12 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard)
+  @Post('delete-user-story')
+  deleteUserStory(@Body('userStoryId') userStoryId: number,  @Request() req){
+    return this.authService.deleteUserStory(userStoryId ,req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
   @Post('update-feature')
   updateFeature(@Body() updateFeatureDto: UpdateFeatureDto, @Request() req) {
     return this.authService.updateFeature(
@@ -302,6 +308,12 @@ export class AuthController {
     )
   }
 
+  @UseGuards(AuthGuard)
+  @Post('delete-task')
+  deleteTask(@Body('taskId') taskId: number,  @Request() req){
+    return this.authService.deleteTask(taskId ,req.user.sub);
+  }
+
   @Post('reset-password')
   sendResetPasswordEmail(@Body() email: Email) {
     return this.authService.sendResetPassword(email.email);
@@ -320,5 +332,6 @@ export class AuthController {
   deleteuser(@Request() req){
     return this.authService.deleteUser(req.user.sub);
   }
+
 
 }

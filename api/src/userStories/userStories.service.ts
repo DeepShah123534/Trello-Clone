@@ -43,6 +43,13 @@ export class UserStoriesService {
     return `${completedTasksLength}/${taskCount}`;
   }
 
+  async getUsersStoryById(id: number) {
+    return await this.userStoriesRepository.findOne({
+       where: { id },
+       relations: ['tasks'],
+      });
+  }
+
     async updateUserStory(field: string, value: string, userId: number, userStoryId: number) {
         const storyToUpdate = await this.userStoriesRepository.findOne({
           where: {
@@ -71,5 +78,23 @@ export class UserStoriesService {
         throw new BadRequestException('YOU CANNOT UPDATE THIS USER STORY');
       }
       
+    }
+
+    async deleteUserStory(userStoryId:number, userId: number) {
+      const storyToDelete = await this.userStoriesRepository.findOne({
+        where: {
+          id: userStoryId,
+          feature: { project: { user: { id: userId } } }  },
+        relations: [ 'feature', 'feature.project'],
+      });
+
+      if(storyToDelete) {
+        await this.userStoriesRepository.delete({ id: userStoryId });
+        return storyToDelete.feature.project.id;
+      
+      } else {
+        throw new BadRequestException('YOU CANNOT DELETE THIS USER STORY');
+      }
+
     }
 } 

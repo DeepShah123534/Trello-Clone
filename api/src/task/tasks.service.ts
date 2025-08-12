@@ -48,7 +48,33 @@ export class TasksService {
       return taskToUpdate.userStory.id;
     } else {
       throw new BadRequestException('YOU CANNOT UPDATE THIS TASK');
+    } 
+  }
+
+  async deleteTask(taskId: number, userId: number) {
+    const taskToDelete = await this.tasksRepository.findOne({
+        where: {
+          id: taskId,
+          userStory: {
+            feature: {
+              project: {
+                user: { id: userId }
+              }
+            }
+          }
+        },
+        relations: [
+          'userStory', 
+        ],
+      });
+    if (taskToDelete) {
+      await this.tasksRepository.delete(taskToDelete);
+
+      return taskToDelete.userStory.id;
+    } else {
+      throw new BadRequestException('YOU CANNOT DELETE THIS TASK');
     }
-    
+
+    // this.tasksRepository.delete(taskToDelete.id);
   }
 } 

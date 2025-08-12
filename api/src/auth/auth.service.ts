@@ -258,8 +258,13 @@ export class AuthService {
       return await this.projectsServices.getProjectById(projectId);
     } 
 
+    async deleteUserStory(userStoryId: number, userId: number) {
+      const projectId = await this.userStoriesService.deleteUserStory(userStoryId, userId);
+      return await this.projectsServices.getProjectById(projectId);
+    }
+
     async updateTask(
-      field: string, 
+      field: string,
       value: string, 
       userId: number,
       taskId: number,
@@ -287,4 +292,17 @@ export class AuthService {
     ) {
       return await this.projectsServices.updateProject(field, value, userId, projectId);
     } 
+
+    async deleteTask(taskId: number, userId: number) {
+      const userStoryId = await this.tasksService.deleteTask(taskId, userId);
+
+      const storyStatus = await this.userStoriesService.getUserStoryById(userStoryId);
+
+      const updatedUserStory = await this.userStoriesService.getUsersStoryById(userStoryId);
+
+      return  {
+        storyStatus,
+        taskList: updatedUserStory ? updatedUserStory.tasks : [],
+      }
+    }
 }

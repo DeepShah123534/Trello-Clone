@@ -63,7 +63,7 @@ const router = createBrowserRouter([
             } catch (error) {
               // If we have an expired token, we will use error and redirect user to log-in page
               alert("You must be signed in to view this page.")
-              // alert("There was an error");
+  
               return redirect("/log-in");
             }
           } else {
@@ -96,7 +96,7 @@ const router = createBrowserRouter([
             } catch (error) {
               // If we have an expired token, we will use error and redirect user to log-in page
               alert("You must be signed in to view this page.")
-              // alert("There was an error");
+
               return redirect("/log-in");
             }
           } else {
@@ -124,7 +124,6 @@ const router = createBrowserRouter([
             } catch (error) {
               // If we have an expired token, we will use error and redirect user to log-in page
               alert("You must be signed in to view this page.")
-              // alert("There was an error");
               return redirect("/log-in");
             }
           } else {

@@ -6,12 +6,14 @@ import { toaster } from "../toaster";
 import { useNavigate } from "react-router-dom";
 
 
+
 type Props = {
     task:  Task;
     setStoryStatus: React.Dispatch<React.SetStateAction<string>>;
+    setTaskList: React.Dispatch<React.SetStateAction<Task[]>>;
 } 
 
-const TaskBox = ({ task, setStoryStatus }: Props) => {
+const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
 
     const [taskStatus, setTaskStatus] = useState(task.status);
     const [updateName, setUpdateName] = useState(false);
@@ -54,6 +56,7 @@ const TaskBox = ({ task, setStoryStatus }: Props) => {
             
             setStoryStatus(response.data);
             setUpdateName(false);
+           
 
             toaster.success({
                     title: `Your task ${field} updated to successfully`,
@@ -103,6 +106,45 @@ const TaskBox = ({ task, setStoryStatus }: Props) => {
        
     };
 
+    const deleteTask = () => {
+          const token = localStorage.getItem("token");
+
+          axios.post('http://localhost:3000/auth/delete-task',
+            {
+              taskId: task.id,
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+          ).then((response) => {
+            setStoryStatus(response.data.storyStatus);
+            setTaskList(response.data.taskList);
+
+            toaster.success({
+                    title: `Your task deleted to successfully`,
+                    type: "success", 
+                    closable: true,
+                })
+            
+          }).catch ((error) => {
+
+
+                if (error.response.data.message === 'Unauthorized') {
+                    toaster.error({
+                      title: "Error",
+                      description: "Your session has expired log in again.",
+                      closable: true,
+                    });
+                
+                    navigate('/log-in')
+                } else {
+                  toaster.error({
+                      title: "Error",
+                      description: "There was an error deleting the task. Please try again.",
+                      closable: true,
+                    });
+                }
+          })
+    }
+
 
     return (
 
@@ -127,6 +169,7 @@ const TaskBox = ({ task, setStoryStatus }: Props) => {
                 <Text flex={1}> {task.name}</Text>
               )}
               </Box>
+
               <IconButton
               
                 aria-label="Edit"
@@ -138,7 +181,8 @@ const TaskBox = ({ task, setStoryStatus }: Props) => {
               >
                 {updateName ? "✔" : "✏️"}
               </IconButton>
-            
+
+          
             <Button 
             w="118px"
             onClick={toggleTaskStatus}
@@ -146,6 +190,11 @@ const TaskBox = ({ task, setStoryStatus }: Props) => {
                 {taskStatus}
                 
             </Button>
+            <Button variant="outline"  onClick={deleteTask}  >
+              Delete
+
+            </Button>
+
         </Box>
     )
 }
