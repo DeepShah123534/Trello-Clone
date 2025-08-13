@@ -1,4 +1,4 @@
-import { Box, IconButton, Input, Text } from "@chakra-ui/react";
+import { Box, Button, IconButton, Input, Text, useDisclosure } from "@chakra-ui/react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
 import CreateFeatureAccordion from "../components/ui/Feature/CreateFeatureAccordion";
@@ -7,6 +7,7 @@ import  { UserStory } from "../components/ui/Feature/FeatureModal";
 import FeatureBox from "../components/ui/Feature/FeatureBox";
 import { toaster } from "../components/ui/toaster";
 import axios from "axios";
+import DeleteModal from "../components/ui/DeleteModal";
 
 
 export type Feature = {
@@ -38,6 +39,8 @@ const Project = () => {
     const [updateProjectName, setUpdateProjectName] = useState(false);
     const [updateProjectDescription, setUpdateProjectDescription] = useState(false);
 
+    const { open: openDelete, onOpen: onOpenDelete, onClose: onCloseDelete, } = useDisclosure();
+
     const editName = () => {
         setUpdateProjectName(!updateProjectName);
     }
@@ -53,6 +56,7 @@ const Project = () => {
     const onChangeDescription = (e: any) => {
         setProjectDescription(e.target.value);
     };
+
 
     const updateProject = (field: "name" | "description", value: string | undefined) => {
 
@@ -110,9 +114,49 @@ const Project = () => {
           })
     };
 
+    const deleteProject = () => {
+      const token = localStorage.getItem("token");
+
+          axios.post('http://localhost:3000/auth/delete-project',
+            {
+                projectId: project.id,
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+          ).then((response) => {
+            navigate('/projects')
+
+            toaster.success({
+                    title: `Your project deleted successfully`,
+                    type: "success", 
+                    closable: true,
+                })
+            
+          }).catch ((error) => {
+
+
+                if (error.response.data.message === 'Unauthorized') {
+                    toaster.error({
+                      title: "Error",
+                      description: "Your session has expired log in again.",
+                      closable: true,
+                    });
+                
+                    navigate('/log-in')
+                } else {
+                  toaster.error({
+                      title: "Error",
+                      description: "There was an error deleting the project. Please try again.",
+                      closable: true,
+                    });
+                }
+          })
+         
+    }
+
     return (
         <Box m={10} >
-            <Box mb={20} >
+            <Box mb={20} display="flex" justifyContent="space-between">
+            <Box flex={1}>
             <Box display="flex" mb={4} alignItems="center" gap={3}>
             { updateProjectName ? (
                 <Box  width="1000px" flex={1} mr={4} >
@@ -189,10 +233,13 @@ const Project = () => {
              </IconButton>
 
         </Box>
-            
 
+        </Box>
 
-            </Box>
+        <Button onClick={onOpenDelete}>Delete Project</Button>
+          
+        </Box>
+        
             <Box display="flex" gap={10}  alignItems="flex-start">
                 {columns.map((column) => {
                     return (
@@ -202,7 +249,7 @@ const Project = () => {
                                 if (column.name === feature.status){
                                     return (
                                     <FeatureBox 
-                                    key={feature.id}
+                                     key={feature.id}
                                      feature={feature} 
                                      projectId={project.id} 
                                      setProject={setProject}/>
@@ -228,6 +275,11 @@ const Project = () => {
                     );
                 })}
             </Box>
+            <DeleteModal 
+            isOpen={openDelete}
+            onClose={onCloseDelete}
+            itemType="project"
+            deleteItem={deleteProject} />
         </Box>
     );
 }

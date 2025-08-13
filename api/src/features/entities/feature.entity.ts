@@ -7,7 +7,7 @@ export class Feature {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Project, (project) => project.features, { eager: true }) // eager loads user automatically
+  @ManyToOne(() => Project, (project) => project.features, { onDelete: 'CASCADE' , eager: true }) // eager loads user automatically
   @JoinColumn({ name: 'projectId' })
   project: Project;
 
@@ -19,9 +19,6 @@ export class Feature {
 
   @Column({ nullable: true })
   description?: string;
-
-  // @Column({ default: 'To Do' })
-  // status: string;
 
   @OneToMany(() => UserStory, (userStory) => userStory.feature)
   userStories: UserStory[];

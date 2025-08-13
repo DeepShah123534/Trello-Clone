@@ -123,7 +123,7 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
             },
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
-            console.log("RESPONSE", response.data)
+      
             setProject(response.data);
 
             toaster.success({

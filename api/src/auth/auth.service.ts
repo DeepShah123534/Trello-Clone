@@ -310,4 +310,9 @@ export class AuthService {
         taskList: updatedUserStory ? updatedUserStory.tasks : [],
       }
     }
+
+    async deleteProject(projectId: number,  userId: number,){
+      return await this.projectsServices.deleteProject(projectId, userId);
+
+    }
 }
