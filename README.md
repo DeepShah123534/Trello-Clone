@@ -24,15 +24,14 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
   - PostgreSQL with TypeORM (Entity Relationships between User and Project)
   - RESTful API endpoints with token-based access control
 
-- ☁️ **Deployment**: Coming soon — Docker + Cloud deployment (e.g., GCP, Render)
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Frontend        | Backend         | Database        | Auth       | DevOps / Other     |
+| Frontend        | Backend         | Database        | Auth       |  Other     |
 |-----------------|-----------------|------------------|------------|--------------------|
-| React, Chakra UI | NestJS (Node.js) | PostgreSQL       | JWT        | TypeORM, Docker (WIP) |
+| React, Chakra UI | NestJS (Node.js) | PostgreSQL       | JWT        | TypeORM |
 
 ---
 

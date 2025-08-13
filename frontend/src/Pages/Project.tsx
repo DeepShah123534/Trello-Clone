@@ -193,10 +193,10 @@ const Project = () => {
 
 
             </Box>
-            <Box display="flex" gap={10} >
+            <Box display="flex" gap={10}  alignItems="flex-start">
                 {columns.map((column) => {
                     return (
-                        <Box border="1px solid" flex={1} key={column.name}>
+                        <Box border="1px solid" flex={1} key={column.name} alignSelf="flex-start">
                             <Text textAlign="center" fontSize={20} mt={5}>{column.name}</Text>
                             {project.features.map  ((feature) => {
                                 if (column.name === feature.status){

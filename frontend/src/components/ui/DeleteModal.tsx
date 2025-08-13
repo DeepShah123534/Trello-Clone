@@ -44,7 +44,7 @@ const DeleteModal = ({ isOpen, onClose, itemType, deleteItem } : Props) => {
               <Text>
                 {`Are you sure you want to delete this ${itemType} ? `}
                 {`You will be permanently deleteing all associated ${getAssociatedItems()}.`}
-                {` Hit Delete to celete OR Close to cancel.`}
+                
               </Text>
                 
               </Box>

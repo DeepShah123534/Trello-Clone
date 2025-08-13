@@ -44,9 +44,8 @@ const UserStoryDetailAccordion = ( {name, status,
 
     const { open, onOpen, onClose } = useDisclosure();  
     const [taskList, setTaskList] = useState(tasks)
-
-    
-
+    const [startDelete, setStartDelete] = useState(false);
+  
     const navigate = useNavigate();
 
 
@@ -171,8 +170,10 @@ const UserStoryDetailAccordion = ( {name, status,
 
    return (
    <>
-   {updateStoryName ?  
+   {updateStoryName || startDelete?  
       <Box border="1px solid" display="flex" p={4} gap={4} alignItems="center" >
+        { updateStoryName ? 
+          <>  
         <Box flex={1} >
         <Input
             mr={4}
@@ -198,6 +199,24 @@ const UserStoryDetailAccordion = ( {name, status,
                 {updateStoryName ? "✔" : "✏️"}
                   
             </IconButton>
+        
+        </> : 
+          <>
+            <Text flex={1} >{name}</Text>
+                        
+                        <IconButton
+                            mr={2}
+                            aria-label="Edit"
+                            variant="outline"
+                            size="md"
+                            onClick={onClickEditName}
+                          >
+                            {updateStoryName ? "✔" : "✏️"}
+                            
+                          </IconButton>
+          </>
+        }
+
             <Text mr={4} >{storyStatus}</Text> 
             <Button variant="outline"  onClick={onOpen}  mr={4}> Delete </Button>
       </Box>:
@@ -226,7 +245,7 @@ const UserStoryDetailAccordion = ( {name, status,
 
                         <Text mr={2}>{storyStatus}</Text> 
 
-                        <Button variant="outline"  onClick={onOpen}  mr={4}> Delete </Button>
+                        <Button variant="outline"  onClick={() => {setStartDelete(true); onOpen()}}  mr={4}> Delete </Button>
                                                
                     <Accordion.ItemIndicator /> 
                 </Accordion.ItemTrigger>
@@ -286,7 +305,14 @@ const UserStoryDetailAccordion = ( {name, status,
             </Accordion.Root>
         </Box>
       }
-      <DeleteModal isOpen={open} onClose={onClose} deleteItem={deleteStory} itemType={"user story"}/>
+      <DeleteModal 
+      isOpen={open} 
+      onClose={() => {
+        onClose();
+        setStartDelete(false);
+      }} 
+      deleteItem={deleteStory} 
+      itemType={"user story"}/>
       </>
   );
 }

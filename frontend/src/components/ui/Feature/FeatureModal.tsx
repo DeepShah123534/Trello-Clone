@@ -1,4 +1,4 @@
-import { Box, Text, CloseButton, Dialog, Portal, Input, IconButton } from "@chakra-ui/react"
+import { Box, Text, CloseButton, Dialog, Portal, Input, IconButton, Button, useDisclosure } from "@chakra-ui/react"
 import UserStoryDetailAccordion, { Task } from "../UserStories/UserStoryDetailAccordion";
 import CreateUserStoryAccordion from "../UserStories/CreateUserStoryAccordion";
 import { Project } from "@/Pages/Projects";
@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toaster } from "../toaster";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import DeleteModal from "../DeleteModal";
 
 
 type Props = {
@@ -44,6 +45,8 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
 
     const [description, setDescription] = useState(featureDescription);
     const [updateFeatureDescription, setUpdateFeatureDescription] = useState(false);
+
+    const { open: openDelete, onOpen: onOpenDelete, onClose: onCloseDelete, } = useDisclosure();
 
     const navigate = useNavigate();
 
@@ -111,6 +114,46 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
           })
     };
 
+    const deleteFeature = () => {
+      const token = localStorage.getItem("token");
+
+          axios.post('http://localhost:3000/auth/delete-feature',
+            {
+              featureId,
+            },
+            { headers: { Authorization: `Bearer ${token}`} }
+          ).then((response) => {
+            console.log("RESPONSE", response.data)
+            setProject(response.data);
+
+            toaster.success({
+                    title: `Your feature deleted successfully`,
+                    type: "success", 
+                    closable: true,
+                })
+            
+          }).catch ((error) => {
+
+
+                if (error.response.data.message === 'Unauthorized') {
+                    toaster.error({
+                      title: "Error",
+                      description: "Your session has expired log in again.",
+                      closable: true,
+                    });
+                
+                    navigate('/log-in')
+                } else {
+                  toaster.error({
+                      title: "Error",
+                      description: "There was an error deleting the feature. Please try again.",
+                      closable: true,
+                    });
+                }
+          })
+         
+    }
+
     return (
      
             <Dialog.Root 
@@ -119,11 +162,12 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
             motionPreset="slide-in-bottom" 
             modal 
             open={open} 
-            onClose={onClose}>
+            onClose={onClose}
+            >
                 <Portal>
                     <Dialog.Backdrop />
                     <Dialog.Positioner>
-                    <Dialog.Content minW="75%" minH="75%"> 
+                    <Dialog.Content minW="75%" minH="75%" justifyContent="space-between"> 
                         <Dialog.Header>
                         <Dialog.Title>
                             <Box mb={20} >
@@ -212,8 +256,8 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                             <CloseButton size="sm" onClick={onClose} />
                         </Dialog.CloseTrigger>
                         </Dialog.Header>
-                        <Dialog.Body>
-                            <Box display="flex" flexDirection="column" gap={5}>
+                        <Dialog.Body >
+                            <Box display="flex" flexDirection="column" gap={5} >
                             {stories.map((story) => {
                                 return (
                                  <UserStoryDetailAccordion 
@@ -234,9 +278,23 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                             projectId={projectId}
                             setProject={setProject}
                             />
+                            
+                            
                             </Box>
+                            
+                           
+                            
+                            
                         </Dialog.Body>
+                         <Button m={10} onClick={onOpenDelete}>Delete Feature</Button>
+                          <DeleteModal 
+                              isOpen={openDelete}
+                              onClose={onCloseDelete}
+                              itemType="feature"
+                              deleteItem={deleteFeature}
+                          />
                     </Dialog.Content>
+                   
                     </Dialog.Positioner>
                 </Portal>  
             </Dialog.Root>

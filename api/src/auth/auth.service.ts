@@ -284,6 +284,11 @@ export class AuthService {
       return await this.projectsServices.getProjectById(projectId);
     } 
 
+    async deleteFeature(featureId: number,  userId: number,){
+      const projectId = await this.featuresService.deleteFeature(featureId, userId);
+      return await this.projectsServices.getProjectById(projectId);
+    }
+
     async updateProject(
       field: string, 
       value: string, 

@@ -7,12 +7,12 @@ export class UserStory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Feature, (feature) => feature.userStories, { eager: true }) // eager loads user automatically
+  @ManyToOne(() => Feature, (feature) => feature.userStories, { onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'featureId' })
   feature: Feature;
 
   @Column()
-  featureId: number; // Add this so you can filter easily in queries
+  featureId: number; 
 
   @Column()
   name: string;
@@ -23,6 +23,4 @@ export class UserStory {
   @OneToMany(() => Task, (task) => task.userStory)
   tasks: Task[];
 
-  // @Column({ default: 'To Do' })
-  // status: string;
 }

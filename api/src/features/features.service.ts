@@ -50,4 +50,22 @@ export class FeaturesService {
         }
         
       }
+
+  async deleteFeature(featureId: number, userId: number) {
+      const featureToDelete = await this.featuresRepository.findOne({
+        where: {
+          id: featureId,
+         project: { user: { id: userId }  }  },
+        relations: ['project'],
+      });
+
+      if(featureToDelete) {
+        await this.featuresRepository.delete({ id: featureId });
+        return featureToDelete.project.id;
+      
+      } else {
+        throw new BadRequestException('YOU CANNOT DELETE THIS FEATURE');
+      }
+
+    }
 } 
