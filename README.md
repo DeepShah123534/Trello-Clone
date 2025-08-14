@@ -1,4 +1,4 @@
-# Trello CLone – Project Planning Tool 🗂️
+# Trello Clone – Project Planning Tool 🗂️
 
 This is a Trello inspired full-stack project management application that allows users to securely register, log in, and manage project workflows. 
 Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and includes robust authentication, protected routes, and scalable backend architecture.
