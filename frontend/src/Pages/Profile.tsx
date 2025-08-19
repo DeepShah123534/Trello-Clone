@@ -5,6 +5,8 @@ import {  Box, Text, Button, Avatar} from "@chakra-ui/react";
 import UserDetailsRow from "../components/ui/Profile/UserDetailsRow";
 import { useState } from "react";
 import axios from "axios";
+import { toaster } from "../components/ui/toaster";
+
 
 
 export type Data = {
@@ -25,7 +27,12 @@ const Profile = () => {
         localStorage.removeItem("token");
         context.toggleLoggedIn();
         navigate("/log-in");
-        alert("You have been logged out of your account");
+        toaster.success({
+                      title: "success",
+                      description: "You have been logged out of your account.",
+                      closable: true,
+                    });
+        
     }
 
     const deleteAccount = () => {
@@ -38,13 +45,24 @@ const Profile = () => {
         )
         .then((response) => {
           localStorage.removeItem("token");
-          alert("Account deleted successfully.");
+          
+          
+                toaster.success({
+                    title: "Account deleted successfully.",
+                    type: "success", 
+                    closable: true,
+                })
           navigate("/sign-up");
           console.log("RESPONSE", response.data);
         })
         .catch((error) => {
           console.log('ERROR:' , error)
-          alert("Error deleting account. Please try again.");
+          toaster.success({
+                    title: "Error deleting account. Please try again.",
+                    type: "success", 
+                    closable: true,
+                })
+         
         })
     };
 

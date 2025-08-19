@@ -9,6 +9,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { toaster } from "../components/ui/toaster"
 
 
+
 const LogIn = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -76,7 +77,8 @@ const LogIn = () => {
   };
 
   return (
-    <Box position="relative">
+    <div className="login-container" >
+    <Box position="relative"  >
       <Text textAlign="center" mb={4} fontSize={20}>
         Log Into Your Account
       </Text>
@@ -120,6 +122,9 @@ const LogIn = () => {
       
 
     </Box>
+    
+    </div>
+
   );
 };
 

@@ -1,6 +1,7 @@
 import { FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/form-control";
 import { Box, Button, Input, Text } from "@chakra-ui/react"
 import { useNavigate, useParams } from "react-router-dom";
+import { toaster } from "../components/ui/toaster";
 
 import { useState } from "react";
 import axios from "axios";
@@ -47,10 +48,20 @@ const ResetPassword = () => {
         setPassword("");
         setSecondPassword("");
         navigate("/log-in");
-        alert("Password reset successfully. You can now log in with your new password.");
+                toaster.success({
+                    title: "success",
+                    description: "Password reset successfully. You can now log in with your new password.",
+                    closable: true,
+                  });
+        
         })
         .catch((error) => {
-          alert("Error resetting password. Please try again.");
+          toaster.error({
+           title: "error",
+           description: "Error resetting password. Please try again.",
+           closable: true,
+         });
+
         })
     }
 

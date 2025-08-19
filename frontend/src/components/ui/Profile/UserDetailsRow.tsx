@@ -68,10 +68,20 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
       .then((response) => {
         console.log("RESPONSE", response.data);
         setData(response.data)
-        alert("We've updated your account")
+        toaster.success({
+            title: "success",
+            description: "We've updated your account.",
+            closable: true,
+          });
+          
       }).catch((error) => {
         console.log('ERROR', error)
-        alert("There was an error. Please review your information and try again");
+        toaster.error({
+           title: "error",
+           description: "There was an error. Please review your information and try again",
+           closable: true,
+         });
+        
       });
 
   };

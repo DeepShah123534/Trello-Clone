@@ -2,6 +2,7 @@ import { Box, Heading, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 
+
 const pages = [
   { name: "Log In", path: "/log-in", showWhenLoggedIn: false },
   { name: "Create an Account", path: "/sign-up", showWhenLoggedIn: false},
@@ -15,16 +16,22 @@ type Props = {
 
 const Header = ({ loggedIn }: Props) => {
   return (
-    <Box p={4} display="flex" alignItems="center">
+    <div className="header">
+    <Box p={4} display="flex" alignItems="center" >
+      <Link to={loggedIn ? "/projects" : "/"}>
       <Box display="flex" gap={4} alignItems="center">
         <Image
           boxSize="70px"
           borderRadius="50%"
           src="https://bit.ly/naruto-sage"
           alt="Naruto Uzumaki"
+
         />
         <Heading fontSize={24}>Project Planning Tool</Heading>
       </Box>
+      
+      </Link>
+      
       <Box display="flex" justifyContent="space-around" w="70%">
         {pages.map((page) => {
           if ((loggedIn && page.showWhenLoggedIn) || (!loggedIn && !page.showWhenLoggedIn)) {
@@ -37,6 +44,9 @@ const Header = ({ loggedIn }: Props) => {
         })}
       </Box>
     </Box>
+    
+    </div>
+
   );
 };
 

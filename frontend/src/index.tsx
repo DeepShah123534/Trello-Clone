@@ -11,6 +11,8 @@ import axios from "axios";
 // import Project from "./Pages/Project";
 import ResetPassword from "./Pages/ResetPassword";
 import Project from "./Pages/Project";
+import { toaster } from "./components/ui/toaster";
+import Home from "./Pages/Home";
 
 
 const router = createBrowserRouter([
@@ -39,12 +41,77 @@ const router = createBrowserRouter([
         },
     children: [
       {
+        path:"/",
+        index: true,
+        element: <Home />,
+        loader:   async () => {
+          // get token from local Storage
+          const token = localStorage.getItem("token");
+
+          // If we have a token. we will use it as a bearer token on our request for user data
+          if(token) {
+            try{
+              const response = await axios.get('http://localhost:3000/auth/profile',
+              { headers: { Authorization: `Bearer ${token}`} }
+            );
+            return redirect('/projects');
+            } catch (error) {
+              return {};
+            }
+          } else {
+            return {};
+          }
+
+          // If we don't have a token, we will use error and redirectrct user to sign-up page
+        },
+      },
+      {
         path: "/sign-up",
         element: <SignUp />,
+        loader:   async () => {
+          // get token from local Storage
+          const token = localStorage.getItem("token");
+
+          // If we have a token. we will use it as a bearer token on our request for user data
+          if(token) {
+            try{
+              const response = await axios.get('http://localhost:3000/auth/profile',
+              { headers: { Authorization: `Bearer ${token}`} }
+            );
+            return redirect('/projects');
+            } catch (error) {
+              return {};
+            }
+          } else {
+            return {};
+          }
+
+          // If we don't have a token, we will use error and redirectrct user to sign-up page
+        },
       },
       {
         path: "/log-in",
         element: <LogIn />,
+        loader:   async () => {
+          // get token from local Storage
+          const token = localStorage.getItem("token");
+
+          // If we have a token. we will use it as a bearer token on our request for user data
+          if(token) {
+            try{
+              const response = await axios.get('http://localhost:3000/auth/profile',
+              { headers: { Authorization: `Bearer ${token}`} }
+            );
+            return redirect('/projects');
+            } catch (error) {
+              return {};
+            }
+          } else {
+            return {};
+          }
+
+          // If we don't have a token, we will use error and redirectrct user to sign-up page
+        },
       },
       {
         path: "/projects",
@@ -62,12 +129,22 @@ const router = createBrowserRouter([
             return response.data;
             } catch (error) {
               // If we have an expired token, we will use error and redirect user to log-in page
-              alert("You must be signed in to view this page.")
+            
+              toaster.error({
+                      title: "Error",
+                      description: "You must be signed in to view this page.",
+                      closable: true,
+                    });
   
               return redirect("/log-in");
             }
           } else {
-            alert("You must have an account to view this page.")
+            toaster.error({
+                      title: "Error",
+                      description: "You must have an account to view this page.",
+                      closable: true,
+                    });
+           
             return redirect("/sign-up");
           }
 
@@ -88,19 +165,33 @@ const router = createBrowserRouter([
               { headers: { Authorization: `Bearer ${token}`} }
             );
             if(response.data.length === 0 ){
-              alert('You do not have access to that project')
+              toaster.error({
+                      title: "Error",
+                      description: "You do not have access to that project",
+                      closable: true,
+                    });
+              
               return redirect("/projects")
             }
 
             return response.data;
             } catch (error) {
               // If we have an expired token, we will use error and redirect user to log-in page
-              alert("You must be signed in to view this page.")
-
+              toaster.error({
+                      title: "Error",
+                      description: "You must be signed in to view this page.",
+                      closable: true,
+                    });
+              
               return redirect("/log-in");
             }
           } else {
-            alert("You must have an account to view this page.")
+            toaster.error({
+                      title: "Error",
+                      description: "You must have an account to view this page.",
+                      closable: true,
+                    });
+            
             return redirect("/sign-up");
           }
 
@@ -123,11 +214,21 @@ const router = createBrowserRouter([
             return response.data;
             } catch (error) {
               // If we have an expired token, we will use error and redirect user to log-in page
-              alert("You must be signed in to view this page.")
+              toaster.error({
+                      title: "Error",
+                      description: "You must be signed in to view this page.",
+                      closable: true,
+                    });
+  
               return redirect("/log-in");
             }
           } else {
-            alert("You must have an account to view this page.")
+
+            toaster.error({
+                      title: "Error",
+                      description: "You must have an account to view this page.",
+                      closable: true,
+                    });
             return redirect("/sign-up");
           }
 

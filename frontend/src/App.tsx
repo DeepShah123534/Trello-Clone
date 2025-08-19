@@ -4,6 +4,8 @@ import Header from "./components/ui/Header";
 import { Toaster } from "./components/ui/toaster"
 
 import { useState } from "react";
+
+
  
 type Data = {
   email: string;
@@ -29,10 +31,13 @@ function App() {
   console.log("App loggedIn:", loggedIn);
 
   return (
-    <Provider>
+    <Provider >
+  
       <Header loggedIn={loggedIn}/>
       <Outlet context={context}/>
       <Toaster />
+
+
     </Provider>
   );
 }

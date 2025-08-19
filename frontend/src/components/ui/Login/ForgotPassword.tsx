@@ -2,6 +2,7 @@ import { isInvalidEmail } from '../../../Pages/SignUp';
 import { Box, Button, Input, Text } from '@chakra-ui/react';
 import axios from 'axios';
 import { useState } from 'react';
+import { toaster } from '../toaster';
 
 type Props = {
     isOpen: boolean;
@@ -19,7 +20,12 @@ const ForgotPassword = ({ isOpen, onClose }: Props) => {
     console.log("EMAIL: ", email)
     const invalidEmail = isInvalidEmail(email)
     if (invalidEmail) {
-          alert("Please enter a valid email address!");
+              toaster.error({
+                 title: "error",
+                 description: "Please enter a valid email address!",
+                 closable: true,
+               });
+          
           onClose();
         }
     else {
@@ -28,12 +34,22 @@ const ForgotPassword = ({ isOpen, onClose }: Props) => {
         email,
       })
       .then((response) => {
+        
         setEmail("");
         console.log("RESPONSE", response.data)
-        alert("Check you email for further directions")
+        toaster.warning({
+           description: "Check you email for further directions.",
+           closable: true,
+         });
+        
       }).catch((error) => {
         console.log('ERROR: ', error)
-        alert(error.response.data.message)
+          toaster.error({
+           title: "error",
+           description: `${error.response.data.message}`,
+           closable: true,
+         });
+        
       })
    
     }
