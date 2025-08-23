@@ -37,8 +37,6 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
 
 
 🔄 Upcoming Features
-	•	✅ Full CRUD for tasks inside projects
-	•	🔁 Real-time updates using WebSockets
 	•	🧪 Unit & Integration testing with Jest
 	•	☁️ Production deployment with Docker
 
