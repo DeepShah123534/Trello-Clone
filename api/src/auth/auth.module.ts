@@ -25,7 +25,7 @@ import { TasksModule } from 'src/task/tasks.module';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'), // <-- safely fetch JWT_SECRET
        
-        signOptions: { expiresIn: '600s' },
+        signOptions: { expiresIn: '1hr' },
       }),
     }),
   ],

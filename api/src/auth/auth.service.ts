@@ -33,20 +33,37 @@ export class AuthService {
     return  await this.jwtService.signAsync(payload);
   }
 
+  async verifyUniqueUsername(username: string) {
+    const user = await this.usersServices.findUserByUsername(username);
+
+    if (!user?.username) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+
+    async verifyUniqueEmail(email: string) {
+    const user = await this.usersServices.findUserByEmail(email);
+
+    if (!user?.email) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+
   async signUp(signUpDto) {
 
-    const userResult = await this.usersServices.findUserByUsername(signUpDto.username);
-    const usernameExists = !!(userResult && userResult.username);
+    const isUniqueUsername = await this.verifyUniqueUsername(signUpDto.username);
+    const isUniqueEmail = await this.verifyUniqueEmail(signUpDto.email)
 
+    console.log('IS UNQIUE EMAIL: ', isUniqueEmail)
 
-
-    const userEmailUser = await this.usersServices.findUserByEmail(signUpDto.email);
-    const useremailExists = !!(userEmailUser && userEmailUser.email);
-
-    if (usernameExists) {
+    if (!isUniqueUsername) {
       throw new BadRequestException('Username already exists');
     }
-    if (useremailExists) {
+    if (!isUniqueEmail) {
       throw new BadRequestException('Email already exists');
     }
 
@@ -95,7 +112,32 @@ export class AuthService {
       const plainTextPassword = accountDetailDto.value;
       const hashedPassword = await this.hashPassword(plainTextPassword);
       user[accountDetailDto.field] = hashedPassword;
-    } else {
+    } 
+    
+    else if (accountDetailDto.field === 'username'){
+      const isUniqueUsername = await this.verifyUniqueUsername(
+        accountDetailDto.value,
+      );
+
+
+      if(!isUniqueUsername) {
+        throw new BadRequestException('Username already exists')
+      }
+      user[accountDetailDto.field] = accountDetailDto.value;
+    }
+
+    else if (accountDetailDto.field === 'email') {
+       const isUniqueEmail = await this.verifyUniqueEmail(
+        accountDetailDto.value,
+      );
+
+      if(!isUniqueEmail) {
+        throw new BadRequestException('Username already exists')
+      }
+      user[accountDetailDto.field] = accountDetailDto.value;
+    } 
+    
+    else{
       user[accountDetailDto.field] = accountDetailDto.value;
     }
 

@@ -28,6 +28,10 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
   };
 
   const onClickCheck = () => {
+
+    console.log("FILED ", field);
+    console.log("VALUE ", value);
+
     if (field === "Email" && isInvalidEmail(valueState)) {
       toaster.error({
               title: "Error",
@@ -38,24 +42,27 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
       return;
     }
     else {
-        if(valueState === ""){
+        if(valueState === "" ) {
             toaster.error({
               title: "Error",
               description: "The space cannot be empty.",
               closable: true,
             });
-
-            if(field !== "Password"){
-              setValueState(value);
-            }
             
             return;
         }
+
+        
     }
+    // user doesn't make a change
+    if (valueState === value){
+          setUpdateField(!updateField);
+          return;
+        }
 
     const token = localStorage.getItem("token");
 
-    setUpdateField(false);
+    setUpdateField(!updateField);
 
     axios
       .post("http://localhost:3000/auth/change-account-detail", {
@@ -76,6 +83,7 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
           
       }).catch((error) => {
         console.log('ERROR', error)
+        setValueState(value);
         toaster.error({
            title: "error",
            description: "There was an error. Please review your information and try again",
@@ -93,7 +101,7 @@ const UserDetailsRow = ({ field, value, username, setData}: Props): JSX.Element 
         <Input
           flex={1}
           h="32px"
-          value={valueState}
+          value={valueState !== "default" ?  valueState : ""}
           onChange={onChange}
           type={field === "Password" ? "password" : "text"}
         />

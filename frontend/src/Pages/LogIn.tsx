@@ -26,6 +26,8 @@ const LogIn = () => {
   const isErrorUsername = username === "" && submitClicledUsername;
   const isErrorPassword = password === "" && submitClickedPassword;
 
+  console.log("USER LOGGED IN: ", context.loggedIn)
+
   const onChangeUsername = (e: any) => {
     setSubmitClickedUsername(false);
     setUsername(e.target.value);
@@ -93,7 +95,7 @@ const LogIn = () => {
         gap={4}
       >
         <FormControl w="100%" isInvalid={isErrorUsername} isRequired>
-          <FormLabel>Username</FormLabel>
+          <FormLabel>Enter Username</FormLabel>
           <Input type="text" value={username} onChange={onChangeUsername} />
           {!isErrorUsername ? null : (
             <FormErrorMessage>Username is required</FormErrorMessage>
@@ -101,7 +103,7 @@ const LogIn = () => {
         </FormControl>
 
         <FormControl w="100%" isInvalid={isErrorPassword} isRequired>
-          <FormLabel>Password</FormLabel>
+          <FormLabel>Enter Password</FormLabel>
           <Input type="password" value={password} onChange={onChangePassword} />
           {!isErrorPassword ? null : (
             <FormErrorMessage>Password is required</FormErrorMessage>

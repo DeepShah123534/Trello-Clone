@@ -91,6 +91,7 @@ const SignUp = () => {
         setSubmitClickedPassword(true);
         setSubmitClickedSecondPassword(true);
 
+
         if (
             name === "" ||
             isInvalidEmail(email) ||

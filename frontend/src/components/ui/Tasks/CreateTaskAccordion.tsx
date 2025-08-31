@@ -4,8 +4,9 @@ import { useState } from "react";
 
 import axios from "axios";
 import { toaster } from "../toaster";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { Project } from "@/Pages/Projects";
+import { Context } from "@/App";
 
 type Props = {
   featureId: number;
@@ -27,6 +28,8 @@ const CreateTaskAccordion = ({ featureId, projectId, userStoryId, setProject } :
   const [isOpen, setIsOpen] = useState(false);
 
   const isErrorName = name === "" && submitClickedName;
+
+  const context = useOutletContext() as Context;
 
     const onchangeName = (e: any) => {
         setSubmitClickedName(false);
@@ -77,6 +80,7 @@ const CreateTaskAccordion = ({ featureId, projectId, userStoryId, setProject } :
                   description: "Your session has expired log in again.",
                   closable: true,
                 });
+                context.toggleLoggedIn();
                 navigate('/log-in')
             } else {
               toaster.error({

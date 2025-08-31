@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Input, Text, useDisclosure } from "@chakra-ui/react";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
 import { Project as ProjectType } from "./Projects";
 import CreateFeatureAccordion from "../components/ui/Feature/CreateFeatureAccordion";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import FeatureBox from "../components/ui/Feature/FeatureBox";
 import { toaster } from "../components/ui/toaster";
 import axios from "axios";
 import DeleteModal from "../components/ui/DeleteModal";
+import { Context } from "@/App";
 
 
 export type Feature = {
@@ -32,6 +33,7 @@ const Project = () => {
     const [project, setProject] = useState(loaderData)
 
     const navigate = useNavigate();
+    const context = useOutletContext() as Context;
 
     const [projectName, setProjectName] = useState(project.name);
     const [projectDescription, setProjectDescription] = useState(project.description);
@@ -70,6 +72,16 @@ const Project = () => {
             return;
         }
 
+        if (
+            projectName === project.name &&
+            projectDescription === project.description
+        ) {
+        
+            setUpdateProjectName(false);
+            setUpdateProjectDescription(false);
+            return;
+
+        }
 
         const token = localStorage.getItem("token");
 
@@ -102,7 +114,7 @@ const Project = () => {
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -140,7 +152,7 @@ const Project = () => {
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -205,11 +217,12 @@ const Project = () => {
                         onChange={onChangeDescription}
                         type="text"
                         size="lg"
+
                         
                       />
                 </Box>
             ) : (
-            <Text mr={4} fontSize={20}>
+            <Text mr={4} fontSize={20} >
                 {project.description || "There is no Project Description. "}
             </Text>
             )
@@ -274,7 +287,7 @@ const Project = () => {
                         </Box>
                     );
                 })}
-            </Box>
+        </Box>
             <DeleteModal 
             isOpen={openDelete}
             onClose={onCloseDelete}

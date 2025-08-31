@@ -191,6 +191,8 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('change-account-detail')
   changeAccountDetail(@Body() accountDetailDto: AccountDetailDto) {
+    console.log('FIELD: ', accountDetailDto.field);
+    console.log('VALUE: ', accountDetailDto.value);
     return this.authService.changeAccountDetails(accountDetailDto);
   }
 

@@ -7,7 +7,7 @@ export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.projects, { eager: true }) // eager loads user automatically
+  @ManyToOne(() => User, (user) => user.projects, { onDelete: 'CASCADE', eager: true }) // eager loads user automatically
   @JoinColumn({ name: 'userId' })
   user: User;
 

@@ -117,10 +117,8 @@ const router = createBrowserRouter([
         path: "/projects",
         element: <Projects />,
         loader: async () => {
-          // get token from local Storage
           const token = localStorage.getItem("token");
 
-          // If we have a token. we will use it as a bearer token on our request for user data
           if(token) {
             try{
               const response = await axios.get('http://localhost:3000/auth/user-projects',
@@ -128,7 +126,6 @@ const router = createBrowserRouter([
             );
             return response.data;
             } catch (error) {
-              // If we have an expired token, we will use error and redirect user to log-in page
             
               toaster.error({
                       title: "Error",
@@ -176,7 +173,7 @@ const router = createBrowserRouter([
 
             return response.data;
             } catch (error) {
-              // If we have an expired token, we will use error and redirect user to log-in page
+
               toaster.error({
                       title: "Error",
                       description: "You must be signed in to view this page.",
@@ -213,7 +210,7 @@ const router = createBrowserRouter([
             );
             return response.data;
             } catch (error) {
-              // If we have an expired token, we will use error and redirect user to log-in page
+
               toaster.error({
                       title: "Error",
                       description: "You must be signed in to view this page.",

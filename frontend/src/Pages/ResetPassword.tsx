@@ -38,7 +38,12 @@ const ResetPassword = () => {
         setSubmitPassword(true);
         setSubmitSecondPassword(true);
 
-        axios
+        if (password === "" ||
+          secondPassword !== password ||
+          secondPassword === "") {
+            return;
+        } else {
+          axios
         .post("http://localhost:3000/auth/save-new-password", {
           newPassword: password,
           id,
@@ -62,7 +67,8 @@ const ResetPassword = () => {
            closable: true,
          });
 
-        })
+        }) 
+        }
     }
 
 

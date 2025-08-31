@@ -5,8 +5,9 @@ import { Project } from "@/Pages/Projects";
 import TaskBox from "../Tasks/TaskBox";
 import { toaster } from "../toaster";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutlet, useOutletContext } from "react-router-dom";
 import DeleteModal from "../DeleteModal";
+import { Context } from "@/App";
 
 
 
@@ -39,6 +40,7 @@ const UserStoryDetailAccordion = ( {name, status,
     const [updateStoryDescription, setUpdateStoryDescription] = useState(false);
 
     const [storyDescription, setStoryDescription] = useState(description);
+    const context = useOutletContext() as Context;
     
     const [isOpen, setIsOpen] = useState(false);
 
@@ -83,6 +85,13 @@ const UserStoryDetailAccordion = ( {name, status,
             return;
         }
 
+        if (
+          storyName === name && storyDescription === description 
+        ) {
+          setUpdateStoryName(false);
+          setUpdateStoryDescription(false);
+          return;
+        }
 
         const token = localStorage.getItem("token");
 
@@ -115,7 +124,7 @@ const UserStoryDetailAccordion = ( {name, status,
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -155,7 +164,7 @@ const UserStoryDetailAccordion = ( {name, status,
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -251,7 +260,7 @@ const UserStoryDetailAccordion = ( {name, status,
                 </Accordion.ItemTrigger>
                 <Accordion.ItemContent>
                     <Accordion.ItemBody borderTop="1px solid" >
-                        <Text ml={8} mt={5} >
+                        <Text ml={8} mt={3} >
                                     
                           <Box display="flex" >
                             { updateStoryDescription ?  
@@ -260,7 +269,7 @@ const UserStoryDetailAccordion = ( {name, status,
                                 <Input
                                     mr={4}
                                     gap={4}
-                                    h="40px"
+                                    h="32px"
                                     value={storyDescription}
                                     onChange={onChangeDescription}
                                     type="text"
@@ -268,10 +277,9 @@ const UserStoryDetailAccordion = ( {name, status,
                                   />
                                 </Box>
                             ) : 
-                            ( <Box  pb={12} flex={1}>
-                                {description}
-                            </Box>)}
-                            <Box ml={10} display="flex"  >
+                            (<Text>{description || "There's no description"}</Text>)
+                            }
+                            <Box ml={10} mb={5} display="flex"  >
                               <IconButton
                              
                             aria-label="Edit"

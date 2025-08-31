@@ -5,15 +5,16 @@ import { Project } from "@/Pages/Projects";
 import { useState } from "react";
 import { toaster } from "../toaster";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import DeleteModal from "../DeleteModal";
+import { Context } from "@/App";
 
 
 type Props = {
     open: boolean;
     onClose:  () => void;
     featureName: string;
-    featureDescription: string;
+    featureDescription: string | undefined;
     featureId: number;
     projectId: number;
     stories: UserStory[]; 
@@ -35,6 +36,8 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
 
     const [name, setName] = useState(featureName);
 
+    const context = useOutletContext() as Context;
+
     const editName = () => {
         setUpdateFeatureName(!updateFeatureName);
     }
@@ -50,6 +53,8 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
 
     const navigate = useNavigate();
 
+  
+
     const onChangeName = (e: any) => {
         setName(e.target.value);
     };
@@ -58,7 +63,7 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
         setDescription(e.target.value);
     };
 
-    const updateFeature = (field: "name" | "description", value: string ) => {
+    const updateFeature = (field: "name" | "description", value: string | undefined ) => {
 
         if(name === ""){
             toaster.error({
@@ -70,6 +75,14 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
             return;
         }
 
+        if (
+          name === featureName &&
+          description === featureDescription
+        ) {
+          setUpdateFeatureName(false);
+          setUpdateFeatureDescription(false);
+          return;
+        }
 
         const token = localStorage.getItem("token");
 
@@ -102,7 +115,7 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -141,7 +154,7 @@ const FeatureModal = ({ open, onClose, featureName, featureDescription, featureI
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({

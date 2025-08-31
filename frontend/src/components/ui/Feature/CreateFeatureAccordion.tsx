@@ -5,8 +5,9 @@ import { useState } from "react";
 import axios from "axios";
 import { Feature } from "@/Pages/Project";
 import { toaster } from "../toaster";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutlet, useOutletContext } from "react-router-dom";
 import { Project } from "@/Pages/Projects";
+import { Context } from "@/App";
 
 type Props = {
   features: Feature[];
@@ -24,6 +25,7 @@ const CreateFeatureAccordion = ({ features, setProject, projectId } : Props) => 
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate()
+  const context = useOutletContext() as Context; 
 
   const isErrorName = name === "" && submitClickedName;
 
@@ -65,6 +67,7 @@ const CreateFeatureAccordion = ({ features, setProject, projectId } : Props) => 
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({

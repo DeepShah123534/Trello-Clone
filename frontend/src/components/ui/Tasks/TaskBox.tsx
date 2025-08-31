@@ -3,7 +3,8 @@ import { Task } from "../UserStories/UserStoryDetailAccordion";
 import { useState } from "react";
 import axios from "axios";
 import { toaster } from "../toaster";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Context } from "@/App";
 
 
 
@@ -18,6 +19,8 @@ const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
     const [taskStatus, setTaskStatus] = useState(task.status);
     const [updateName, setUpdateName] = useState(false);
     const [taskName, setTaksName] = useState(task.name);
+
+    const context = useOutletContext() as Context;
 
   const onChange = (e: any) => {
     setTaksName(e.target.value);
@@ -42,6 +45,10 @@ const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
             return;
         }
 
+        if ( taskName === task.name && taskStatus === task.status) {
+           setUpdateName(false);
+           return;
+        }
 
         const token = localStorage.getItem("token");
 
@@ -53,7 +60,7 @@ const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
             },
             { headers: { Authorization: `Bearer ${token}`} }
           ).then((response) => {
-            
+
             setStoryStatus(response.data);
             setUpdateName(false);
            
@@ -73,7 +80,7 @@ const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -133,7 +140,7 @@ const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
                       description: "Your session has expired log in again.",
                       closable: true,
                     });
-                
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                 } else {
                   toaster.error({
@@ -166,7 +173,7 @@ const TaskBox = ({ task, setStoryStatus, setTaskList }: Props) => {
                   type="text"
                 />
               ) : (
-                <Text flex={1}> {task.name}</Text>
+                <Text flex={1}> {taskName}</Text>
               )}
               </Box>
 

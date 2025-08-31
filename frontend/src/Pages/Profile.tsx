@@ -1,11 +1,12 @@
 
 import { Context } from "../App";
 import { useLoaderData, useNavigate, useOutletContext } from "react-router-dom";
-import {  Box, Text, Button, Avatar} from "@chakra-ui/react";
+import {  Box, Text, Button, Avatar, useDisclosure} from "@chakra-ui/react";
 import UserDetailsRow from "../components/ui/Profile/UserDetailsRow";
 import { useState } from "react";
 import axios from "axios";
 import { toaster } from "../components/ui/toaster";
+import DeleteModal from "../components/ui/DeleteModal";
 
 
 
@@ -19,6 +20,8 @@ const Profile = () => {
     
     const loaderData = useLoaderData() as Data; 
     const [data, setData] = useState(loaderData);
+
+    const { open: openDelete, onOpen: onOpenDelete, onClose: onCloseDelete, } = useDisclosure();
  
     const navigate = useNavigate();
     const context = useOutletContext() as Context;
@@ -53,7 +56,7 @@ const Profile = () => {
                     closable: true,
                 })
           navigate("/sign-up");
-          console.log("RESPONSE", response.data);
+          context.toggleLoggedIn();
         })
         .catch((error) => {
           console.log('ERROR:' , error)
@@ -87,7 +90,7 @@ const Profile = () => {
             <UserDetailsRow field="Name" value={data.name} username={data.username} setData={setData}/>
             <UserDetailsRow field="Email" value={data.email} username={data.username} setData={setData} />
             <UserDetailsRow field="Username" value={data.username} username={data.username} setData={setData} />
-            <UserDetailsRow field="Password" value="********" username={data.username} setData={setData}/>
+            <UserDetailsRow field="Password" value="default" username={data.username} setData={setData}/>
 
           </Box>
 
@@ -95,8 +98,14 @@ const Profile = () => {
 
         <Box display="flex" gap={7} justifyContent="center">
           <Button onClick={logOut}> Log Out </Button>
-          <Button onClick={deleteAccount}> Delete Account </Button>
+          <Button onClick={onOpenDelete}> Delete Account </Button>
         </Box>
+
+        <DeleteModal 
+            isOpen={openDelete}
+            onClose={onCloseDelete}
+            itemType="account"
+            deleteItem={deleteAccount} />
     </Box>
   );
 }

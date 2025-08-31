@@ -4,7 +4,8 @@ import FeatureModal from "./FeatureModal";
 import { Project } from "@/Pages/Projects";
 import axios from "axios";
 import { toaster } from "../toaster";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { Context } from "@/App";
 
 type Props = {
     feature: Feature;
@@ -16,6 +17,7 @@ const FeatureBox = ({feature, projectId ,setProject } : Props) => {
 
    const { open, onOpen, onClose } = useDisclosure();
    const navigate = useNavigate();
+   const context = useOutletContext() as Context;
 
    const onCloseModal = () => {
 
@@ -34,7 +36,7 @@ const FeatureBox = ({feature, projectId ,setProject } : Props) => {
                           description: "Your session has expired log in again.",
                           closable: true,
                         });
-                            
+                    context.toggleLoggedIn();
                     navigate('/log-in')
                     } else {
                         toaster.error({

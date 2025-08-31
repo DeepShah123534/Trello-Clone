@@ -3,13 +3,16 @@ import { Box, Button, CloseButton, Dialog, Text } from "@chakra-ui/react"
 type Props = {
     isOpen: boolean;
     onClose: () => void;
-    itemType: "project" | "feature" | "user story"; 
+    itemType: "account" | "project" | "feature" | "user story"; 
     deleteItem: () => void;
 }
 
 const DeleteModal = ({ isOpen, onClose, itemType, deleteItem } : Props) => {
     const getAssociatedItems = () => {
-        if(itemType === "project") {
+        if (itemType === "account") {
+          return "projects, features, user stories, tasks" 
+        }
+        else if(itemType === "project") {
             return "features, user stories, and tasks";
         } else if(itemType === "feature") {
             return "user stories and tasks";
@@ -19,12 +22,15 @@ const DeleteModal = ({ isOpen, onClose, itemType, deleteItem } : Props) => {
     }
 
     const capitalize = () => {
-      if(itemType === "project") {
-            return "PROJECT";
+        if (itemType === "account") {
+          return "Account" 
+        }
+        else if(itemType === "project") {
+            return "Project";
         } else if(itemType === "feature") {
-            return "FEATURE";
+            return "Feature";
         } else {
-            return "USER STORY";
+            return "User Story";
         }
     }
 

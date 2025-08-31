@@ -4,8 +4,9 @@ import { useState } from "react";
 
 import axios from "axios";    
 import { toaster } from "../toaster";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { Project } from "@/Pages/Projects";
+import { Context } from "@/App";
 
 type Props = {
   // userStories: UserStory[];
@@ -23,6 +24,8 @@ const CreateUserStoryAccordion = ({
   const [name, setName] = useState(""); 
   const [description, setDescription] = useState(""); 
   const navigate = useNavigate();
+
+  const context = useOutletContext() as Context;
 
   const [submitClickedName, setSubmitClickedName] = useState(false);
 
@@ -84,6 +87,7 @@ const CreateUserStoryAccordion = ({
                   description: "Your session has expired log in again.",
                   closable: true,
                 });
+                context.toggleLoggedIn();
                 navigate('/log-in')
             } else {
               toaster.error({
