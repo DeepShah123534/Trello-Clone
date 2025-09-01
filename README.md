@@ -1,4 +1,4 @@
-# Trello Clone – Project Planning Tool 🗂️
+# Project Planning Tool 🗂️
 
 This is a Trello inspired full-stack project management application that allows users to securely register, log in, and manage project workflows. 
 Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and includes robust authentication, protected routes, and scalable backend architecture.
@@ -15,7 +15,7 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
   - Navigate to individual project pages
 
 - 🧩 **Frontend**:
-  - React + Chakra UI for responsive design
+  - React JS for responsive design
   - Accordion-based dynamic project creation form
   - Toast notifications for user feedback
 
@@ -29,15 +29,12 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
 
 ## 🛠️ Tech Stack
 
-| Frontend        | Backend         | Database        | Auth       |  Other     |
-|-----------------|-----------------|------------------|------------|--------------------|
-| React, Chakra UI | NestJS (Node.js) | PostgreSQL       | JWT        | TypeORM |
+| Frontend        | Backend         | Database        | Auth       |  Other     | Unit-testing
+|-----------------|-----------------|------------------|------------|--------------------------|
+| React, Chakra UI | NestJS (Node.js) | PostgreSQL       | JWT        | TypeORM |   Jest
 
 ---
 
 
-🔄 Upcoming Features
-	•	🧪 Unit & Integration testing with Jest
-	•	☁️ Production deployment with Docker
 
 Built by Deep Shah as a personal portfolio project.

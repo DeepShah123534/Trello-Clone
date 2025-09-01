@@ -1,5 +1,5 @@
-import { Feature } from 'src/features/entities/feature.entity';
-import { User } from 'src/users/entities/user.entity';
+import { Feature } from '../../features/entities/feature.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity()
