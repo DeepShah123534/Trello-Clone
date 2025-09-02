@@ -24,11 +24,15 @@ export class UserStoriesService {
     return await this.getFeatureUserStories(featureId);
   }
 
-  async getUserStoryById(id: number) {
-    const userStory = await this.userStoriesRepository.findOne({
+  async getUsersStoryById(id: number) {
+    return await this.userStoriesRepository.findOne({
        where: { id },
        relations: ['tasks'],
       });
+  }
+
+  async getUserStoryById(id: number) {
+    const userStory = await this.getUsersStoryById(id);
 
     if (!userStory) {
       console.log('User story not found');
@@ -43,14 +47,7 @@ export class UserStoriesService {
     return `${completedTasksLength}/${taskCount}`;
   }
 
-  async getUsersStoryById(id: number) {
-    return await this.userStoriesRepository.findOne({
-       where: { id },
-       relations: ['tasks'],
-      });
-  }
-
-    async updateUserStory(field: string, value: string, userId: number, userStoryId: number) {
+  async updateUserStory(field: string, value: string, userId: number, userStoryId: number) {
         const storyToUpdate = await this.userStoriesRepository.findOne({
           where: {
             id: userStoryId,
@@ -78,9 +75,9 @@ export class UserStoriesService {
         throw new BadRequestException('YOU CANNOT UPDATE THIS USER STORY');
       }
       
-    }
+  }
 
-    async deleteUserStory(userStoryId:number, userId: number) {
+  async deleteUserStory(userStoryId:number, userId: number) {
       const storyToDelete = await this.userStoriesRepository.findOne({
         where: {
           id: userStoryId,
@@ -96,5 +93,5 @@ export class UserStoriesService {
         throw new BadRequestException('YOU CANNOT DELETE THIS USER STORY');
       }
 
-    }
+  }
 } 
