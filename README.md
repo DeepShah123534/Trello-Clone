@@ -29,8 +29,6 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
 
 ## 🛠️ Tech Stack
 
-## 🛠️ Tech Stack
-
 - Frontend: React  
 - Backend: NestJS (Node.js)  
 - Database: PostgreSQL with TypeORM
