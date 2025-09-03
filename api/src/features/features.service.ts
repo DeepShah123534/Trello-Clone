@@ -49,7 +49,7 @@ export class FeaturesService {
           throw new BadRequestException('YOU CANNOT UPDATE THIS FEATURE');
         }
         
-      }
+  }
 
   async deleteFeature(featureId: number, userId: number) {
       const featureToDelete = await this.featuresRepository.findOne({
