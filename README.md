@@ -29,18 +29,17 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
 
 ## 🛠️ Tech Stack
 
-- Frontend: React  
+- Frontend: React
 - Backend: NestJS (Node.js)  
 - Database: PostgreSQL with TypeORM
 - Authentication: JWT (JSON Web Tokens)  
-- Testing: Jest  
+- Unit Testing: Jest  
 
 
 ---
 
 
 🔄 Upcoming Features
-	•	🧪 Unit & Integration testing with Jest
 	•	☁️ Production deployment with Docker
 
 Built by Deep Shah as a personal portfolio project.
