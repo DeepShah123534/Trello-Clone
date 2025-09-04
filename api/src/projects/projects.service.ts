@@ -129,7 +129,7 @@ export class ProjectsService {
     return await this.getUserProjects(userId);
   }
 
-    async updateProject(field: string, value: string, userId: number, projectId: number) {
+  async updateProject(field: string, value: string, userId: number, projectId: number) {
         const projectToUpdate = await this.projectsRepository.findOne({
           where: {
             id: projectId,
@@ -147,9 +147,9 @@ export class ProjectsService {
       } else {
         throw new BadRequestException('YOU CANNOT UPDATE THIS PROJECT');
       }
-    }
+  }
 
-    async deleteProject(projectId: number, userId: number) {
+  async deleteProject(projectId: number, userId: number) {
       const projectToDelete = await this.projectsRepository.findOne({
         where: {
           id: projectId,
@@ -164,5 +164,5 @@ export class ProjectsService {
         throw new BadRequestException('YOU CANNOT DELETE THIS PROJECT');
       }
 
-    }
+  }
 } 
