@@ -3,7 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { Project } from './entities/project.entity';
-
+import { Feature } from 'src/features/entities/feature.entity';
+import { mock } from 'node:test';
 
 describe('ProjectsService', () => {
   let service: ProjectsService;
@@ -743,7 +744,7 @@ describe('ProjectsService', () => {
     })
   });
 
-  it('createProject', async() => {
+  it('createProject =>. add new project and return all of user projects based on userId', async() => {
     const name = 'Project 2';
     const description = 'p2 description';
     const userId = 15;
@@ -1066,6 +1067,236 @@ describe('ProjectsService', () => {
       'features.userStories.tasks',
     ] 
   });
+  });
+
+  it('updateProject => updates project name', async() => {
+    const field = 'name';
+    const value = 'Project 1 - Edited';
+    const userId = 15;
+    const projectId = 1;
+
+    const projectToUpdate = {
+        id: 1,
+        name:'Project 1',
+        description:'p1 description',
+    } as Project;
+
+    const updatedProject = {
+        id: 1,
+        name:'Project 1 -- Edited',
+        description:'p1 description',
+    } as Project;
+
+    const projectWithRelations = {
+        id: 1,
+        name:'Project 1 -- Edited',
+        description:'p1 description',
+        features: [] as Feature[],
+    } as Project;
+
+    const projectWithRelationsAndStatuses ={
+      id: 1,
+      name:'Project 1 -- Edited',
+      description:'p1 description',
+      status:'To Do',
+      features: [] as Feature[],
+    };
+
+    jest
+        .spyOn(mockUserProjectsRepository,'findOne')
+        .mockReturnValueOnce(projectToUpdate);
+    jest.spyOn(mockUserProjectsRepository,'save').mockReturnValue(updatedProject);
+    jest
+        .spyOn(mockUserProjectsRepository,'findOne')
+        .mockReturnValueOnce(projectWithRelations);
+
+    const result = await service.updateProject(field,value,userId,projectId);
+
+    expect(result).toEqual(projectWithRelationsAndStatuses);
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalled();
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({
+          where: {
+            id: projectId,
+                user: { id: userId }      
+          },
+        });
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({ 
+    where : { id: projectId },
+    order : {
+        features: {
+          id: 'ASC',
+          userStories: {
+            id: 'ASC',
+            tasks: {
+              id: 'ASC',
+            }
+          }
+        }
+      },
+    relations: [
+      'features', 
+      'features.userStories', 
+      'features.userStories.tasks',
+    ] 
+    });
+    expect(mockUserProjectsRepository.save).toHaveBeenCalled();
+    expect(mockUserProjectsRepository.save).toHaveBeenCalledWith(projectToUpdate);
+  });
+
+  it('updateProject => updates project description', async() => {
+    const field = 'description';
+    const value = 'p1 description - Edited';
+    const userId = 100;
+    const projectId = 1;
+
+    const projectToUpdate = {
+        id: 1,
+        name:'Project 1',
+        description:'p1 description',
+    } as Project;
+
+    const updatedProject = {
+        id: 1,
+        name:'Project 1',
+        description:'p1 description -- Edited',
+    } as Project;
+
+    const projectWithRelations = {
+        id: 1,
+        name:'Project 1',
+        description:'p1 description -- Edited',
+        features: [] as Feature[],
+    } as Project;
+
+    const projectWithRelationsAndStatuses ={
+      id: 1,
+      name:'Project 1',
+      description:'p1 description -- Edited',
+      status:'To Do',
+      features: [] as Feature[],
+    };
+
+    jest
+        .spyOn(mockUserProjectsRepository,'findOne')
+        .mockReturnValueOnce(projectToUpdate);
+    jest.spyOn(mockUserProjectsRepository,'save').mockReturnValue(updatedProject);
+    jest
+        .spyOn(mockUserProjectsRepository,'findOne')
+        .mockReturnValueOnce(projectWithRelations);
+
+    const result = await service.updateProject(field,value,userId,projectId);
+
+    expect(result).toEqual(projectWithRelationsAndStatuses);
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalled();
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({
+          where: {
+            id: projectId,
+                user: { id: userId }      
+          },
+        });
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({ 
+    where : { id: projectId },
+    order : {
+        features: {
+          id: 'ASC',
+          userStories: {
+            id: 'ASC',
+            tasks: {
+              id: 'ASC',
+            }
+          }
+        }
+      },
+    relations: [
+      'features', 
+      'features.userStories', 
+      'features.userStories.tasks',
+    ] 
+    });
+    expect(mockUserProjectsRepository.save).toHaveBeenCalled();
+    expect(mockUserProjectsRepository.save).toHaveBeenCalledWith(projectToUpdate);
+  });
+
+  it('updateProject => throws an error when project is not found', async() => {
+    const field = 'name';
+    const value = 'Project 1 - Edited';
+    const userId = 15;
+    const projectId = 1;
+
+    jest
+        .spyOn(mockUserProjectsRepository,'findOne')
+        .mockReturnValue(undefined);
+      
+    expect(async() => {
+      await service.updateProject(field,value,userId,projectId);
+    }).rejects.toThrow(BadRequestException);
+
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalled();
+    expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({
+          where: {
+            id: projectId,
+            user: { id: userId },   
+          },
+        });
+  });
+
+  it('deleteProject => should delete a project and return the delete project information', async () => {
+      const projectId = 1;
+      const userId = 15;
+
+      const projectToDelete ={
+          id: 1,
+          name:'Project 1',
+          description:'p1 description',
+      };
+
+      const deletedProject ={
+          id: 1,
+          name:'Project 1',
+          description:'p1 description',
+      };
+
+      jest
+          .spyOn(mockUserProjectsRepository,'findOne')
+          .mockReturnValue(projectToDelete);
+      jest
+          .spyOn(mockUserProjectsRepository,'delete')
+          .mockReturnValue(deletedProject);
+
+      const result = await service.deleteProject(projectId,userId);
+      expect(result).toEqual(deletedProject);
+      expect(mockUserProjectsRepository.findOne).toHaveBeenCalled();
+      expect(mockUserProjectsRepository.findOne).toHaveBeenCalled();
+      expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({
+          where: {
+              id: projectId,
+              user: { id: userId },
+          },
+      });
+
+    expect(mockUserProjectsRepository.delete).toHaveBeenCalled();
+    expect(mockUserProjectsRepository.delete).toHaveBeenCalledWith({ id: projectId });
+  });
+
+  it('deleteProject => throw an error when project is not found', async () => {
+      const projectId = 1;
+      const userId = 100;
+
+      jest
+          .spyOn(mockUserProjectsRepository,'findOne')
+          .mockReturnValue(undefined);
+
+      expect(async() => {
+        await service.deleteProject(projectId,userId);
+      }).rejects.toThrow(BadRequestException);
+
+      expect(mockUserProjectsRepository.findOne).toHaveBeenCalled();
+      expect(mockUserProjectsRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: projectId,
+          user: { id: userId },   
+        },
+      });
   });
 
 });
