@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AccountDetailDto } from './auth.controller';
-import { MailService } from 'src/mail/mail.service';
-import { ProjectsService } from 'src/projects/projects.service';
-import { FeaturesService } from 'src/features/features.service';
-import { UserStoriesService } from 'src/userStories/userStories.service';
-import { TasksService } from 'src/task/tasks.service';
+import { MailService } from '../mail/mail.service';
+import { ProjectsService } from '../projects/projects.service';
+import { FeaturesService } from '../features/features.service';
+import { UserStoriesService } from '../userStories/userStories.service';
+import { TasksService } from '../task/tasks.service';
 
 
 @Injectable()
@@ -27,9 +27,15 @@ export class AuthService {
     return await bcrypt.hash(password, saltRounds);
   }
 
-  async createAccessToken(user) {
+  async createAccessToken(user, secret?: string) {
 
     const payload = { sub: user.id};
+    if (secret) {
+      return await this.jwtService.signAsync(payload, {
+        secret,
+        expiresIn: '10m', 
+      });
+    }
     return  await this.jwtService.signAsync(payload);
   }
 
@@ -43,9 +49,9 @@ export class AuthService {
     }
   }
 
-    async verifyUniqueEmail(email: string) {
+  async verifyUniqueEmail(email: string) {
     const user = await this.usersServices.findUserByEmail(email);
-
+    
     if (!user?.email) {
       return true; 
     } else {
@@ -57,12 +63,13 @@ export class AuthService {
 
     const isUniqueUsername = await this.verifyUniqueUsername(signUpDto.username);
     const isUniqueEmail = await this.verifyUniqueEmail(signUpDto.email)
-
-    console.log('IS UNQIUE EMAIL: ', isUniqueEmail)
-
     if (!isUniqueUsername) {
       throw new BadRequestException('Username already exists');
     }
+
+    console.log('IS UNQIUE EMAIL: ', isUniqueEmail)
+
+
     if (!isUniqueEmail) {
       throw new BadRequestException('Email already exists');
     }
@@ -84,7 +91,7 @@ export class AuthService {
 
 // User doesn't exist, so we throw an error
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('username does not exist');
     }
 
 // verify password matches
@@ -92,7 +99,7 @@ export class AuthService {
 
 // if password does not match, throw an error
     if (!passwordsMatch) {
-      throw new UnauthorizedException;
+      throw new UnauthorizedException('Incorrect password');
     }
 // create access token and return it
     return await this.createAccessToken(user);
@@ -119,7 +126,6 @@ export class AuthService {
         accountDetailDto.value,
       );
 
-
       if(!isUniqueUsername) {
         throw new BadRequestException('Username already exists')
       }
@@ -132,7 +138,7 @@ export class AuthService {
       );
 
       if(!isUniqueEmail) {
-        throw new BadRequestException('Username already exists')
+        throw new BadRequestException('Email already exists')
       }
       user[accountDetailDto.field] = accountDetailDto.value;
     } 
@@ -149,7 +155,7 @@ export class AuthService {
     }
   }
 
-    async getProfileData(id: number){
+  async getProfileData(id: number){
     const user = await this.usersServices.findUserById(id);
     return {
       email: user?.email,

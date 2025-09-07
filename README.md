@@ -15,7 +15,7 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
   - Navigate to individual project pages
 
 - 🧩 **Frontend**:
-  - React JS for responsive design
+  - React + Chakra UI for responsive design
   - Accordion-based dynamic project creation form
   - Toast notifications for user feedback
 
@@ -29,12 +29,17 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
 
 ## 🛠️ Tech Stack
 
-| Frontend        | Backend         | Database        | Auth       |  Other     | Unit-testing
-|-----------------|-----------------|------------------|------------|--------------------------|
-| React, Chakra UI | NestJS (Node.js) | PostgreSQL       | JWT        | TypeORM |   Jest
+- Frontend: React
+- Backend: NestJS (Node.js)  
+- Database: PostgreSQL with TypeORM
+- Authentication: JWT (JSON Web Tokens)  
+- Unit Testing: Jest  
+
 
 ---
 
 
+🔄 Upcoming Features
+	•	☁️ Production deployment with Docker
 
 Built by Deep Shah as a personal portfolio project.
