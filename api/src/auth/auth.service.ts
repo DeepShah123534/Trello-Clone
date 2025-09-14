@@ -238,14 +238,13 @@ export class AuthService {
     }
   }
 
-    async createUserStory(name: string, description: string, userId: number, featureId: number, projectId: number) {
+  async createUserStory(name: string, description: string, userId: number, featureId: number, projectId: number) {
       const projects = await this.projectsServices.getUserProjects(userId);
 
       const project = projects.find((project) => project.id === projectId);
 
       if (!project || !project.features) {
-        console.log("❌ Project or its features not found!");
-        throw new UnauthorizedException('project or features not found');
+        throw new UnauthorizedException('Unauthorized');
       }
       const features = project.features;
       const feature = project.features.find((feature) => feature.id === featureId);
@@ -254,12 +253,11 @@ export class AuthService {
         await this.userStoriesService.createUserStory(name, description, featureId);
         return await this.projectsServices.getProjectById(projectId);
       } else {
-        console.log("❌ Feature not found!");
-        throw new UnauthorizedException('feature not found');
+        throw new UnauthorizedException('Unauthorized');
       }
     }
 
-    async createTask(
+  async createTask(
       name: string, 
       userId: number, 
       projectId: number, 
@@ -271,7 +269,7 @@ export class AuthService {
 
       if (!project || !project.features) {
         console.log("❌ Project or its features not found!");
-        throw new UnauthorizedException('project or features not found');
+        throw new UnauthorizedException('Unauthorized');
       }
 
       const features = project.features;
@@ -279,7 +277,7 @@ export class AuthService {
 
       if (!feature || !feature.userStories) {
         console.log("❌ Feature or its user stories not found!");
-        throw new UnauthorizedException('feature or user stories not found');
+        throw new UnauthorizedException('Unauthorized');
       }
 
       const userStories = feature.userStories;
@@ -292,7 +290,7 @@ export class AuthService {
         return await this.projectsServices.getProjectById(projectId);
       } else {
         console.log("❌ user story not found!");
-        throw new UnauthorizedException('user story not found');
+        throw new UnauthorizedException('Unauthorized');
       }
     }
 

@@ -11,9 +11,9 @@ import { MailService } from '../mail/mail.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 import { AccountDetailDto, SignUpDto } from './auth.controller';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { LogInDto } from './auth.controller';
-import e from 'express';
+import { UserStory } from '../userStories/entities/userStory.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -697,6 +697,2451 @@ describe('AuthService', () => {
     expect(usersServices.createuser).toHaveBeenCalledWith(updatedUser);
 
 
+  });
+
+  it('getProfileData => return user name, email, and username corresponding to passed in user id', async () => {
+    const id = 15;
+
+    const user = {
+      id: 15,
+      name: 'Deep Shah',
+      username: 'Deep',
+      password: 'hashed-fake-password',
+      email: 'deepshah@gmail.com',
+    } as User;
+
+    const returningUser = {
+      email: user.email,
+      name: user.name,
+      username: user.username,
+    };
+
+    usersServices.findUserById.mockResolvedValue(user);
+
+    const result = await service.getProfileData(id);
+
+    expect(result).toEqual(returningUser);
+    expect(usersServices.findUserById).toHaveBeenCalled();
+    expect(usersServices.findUserById).toHaveBeenCalledWith(id);
+  });
+
+  it("saveNewPassword => should throw an unauthorized error when the token is invalid ", async () => {
+
+    process.env.JWT_SECRET = 'test-secret'; 
+    const newPassword = 'fake-new-password';
+    const id = 15;
+    const token = 'fake-token';
+
+    const user = {
+      id: 15,
+      name: 'Deep Shah',
+      username: 'Deep',
+      password: 'hashed-fake-password',
+      email: 'deepshah@gmail.com',
+    } as User;
+
+    usersServices.findUserById.mockResolvedValue(user);
+    jwtService.verifyAsync.mockRejectedValue(
+      new UnauthorizedException('token is invalid'),
+    );
+
+    try {
+      await service.saveNewPassword(newPassword, id, token);
+    } catch (error) {
+        expect(error.message).toEqual('token is invalid');
+        expect(usersServices.findUserById).toHaveBeenCalledWith(id);
+        expect(jwtService.verifyAsync).toHaveBeenCalledWith(token, {
+          secret: 'test-secret',
+        });
+    }
+  });
+
+  it('deleteUser => should call users service delete user user method and return deleted user', async() => {
+    const id = 15;
+
+    const deleteResult = {
+      raw: [],
+      affected: 1,  
+    };
+
+    usersServices.deleteUser.mockResolvedValue(deleteResult);
+
+    const result = await service.deleteUser(id);
+
+    expect(result).toEqual(deleteResult);
+    expect(usersServices.deleteUser).toHaveBeenCalled();
+    expect(usersServices.deleteUser).toHaveBeenCalledWith(id);
+  });
+
+  it('getUserProjects => should return an object  with the user data and their projects when passed a user id', async() => {
+    const userId = 15;
+
+    const user = {
+      id: 15,
+      name: 'Deep Shah',
+      username: 'Deep',
+      password: 'hashed-fake-password',
+      email: 'deepshah@gmail.com',
+    } as User;
+
+    const projectsWithStatuses = [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 1,
+          completedUserStories: 0,
+          status: 'To Do',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 1,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    ];
+
+    usersServices.findUserById.mockResolvedValue(user);
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+
+    const result = await service.getUserProjects(userId);
+
+    expect(result).toEqual({user: {
+      email: user.email,
+      name: user.name,
+      username: user.username,
+    }, projects: projectsWithStatuses});
+
+    expect(usersServices.findUserById).toHaveBeenCalled();
+    expect(usersServices.findUserById).toHaveBeenCalledWith(userId);
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+  });
+
+  it('getProject => should return to a project ', async() => {
+
+    const userId = 15;
+
+    const id = 1; 
+
+    const projectsWithStatuses = [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 1,
+          completedUserStories: 0,
+          status: 'To Do',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 1,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    ];
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+
+    const result = await service.getProject(id, userId);
+    expect(result).toEqual(projectsWithStatuses[0]);
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+  });
+
+  it('updateProject => should update project name', async() => {
+    const field = 'name';
+    const value = 'Updated Project Name';
+    const projectId = 1;
+    const userId = 15;
+
+    const updatedProject =     {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    projectsServices.updateProject.mockResolvedValue(updatedProject);
+
+    const result = await service.updateProject(field, value, projectId, userId);
+    
+    expect(result).toEqual(updatedProject);
+    expect(projectsServices.updateProject).toHaveBeenCalled();
+    expect(projectsServices.updateProject).toHaveBeenCalledWith(field, value, projectId, userId);
+  });
+
+  it('deleteProject => should return a delete result after calling the deleteProject method in projectsService', async() => {
+    const projectId = 1;
+    const userId = 15;
+
+    const deleteResult = {
+      raw: [],
+      affected: 1,  
+    };
+
+    projectsServices.deleteProject.mockResolvedValue(deleteResult);
+
+    const result = await service.deleteProject(projectId, userId);
+    expect(result).toEqual(deleteResult);
+    expect(projectsServices.deleteProject).toHaveBeenCalled();
+    expect(projectsServices.deleteProject).toHaveBeenCalledWith(projectId, userId);
+
+  });
+
+  it('createFeature => should create to an existing project and return the updated project', async() => {
+    const name = 'Feature 1';
+    const description = 'F1 description';
+    const userId = 15;
+    const projectId = 2;
+    
+    const projectsWithStatuses = [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [],
+    }
+    ];
+
+    const updatedProject = 
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [{
+        id: 3,
+        name: 'Feature 1',
+        description: 'F1 description',
+        userStoriesCount: 0,
+        completedUserStories: 0,
+        status: 'To Do',
+        userStories: [],
+      }],
+    };
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+    projectsServices.getProjectById.mockResolvedValue(updatedProject);
+
+    const result = await service.createFeature(name, description, userId, projectId);
+    
+    expect(result).toEqual(updatedProject);
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    expect(featuresServices.createFeature).toHaveBeenCalled();
+    expect(featuresServices.createFeature).toHaveBeenCalledWith(
+      name,
+      description,
+      projectId,
+    );
+    expect(projectsServices.getProjectById).toHaveBeenCalled();
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+  });
+
+  it('createFeature => should throw unauthorized error when project is undefined', async() => {
+    const name = 'Feature 1';
+    const description = 'F1 description';
+    const userId = 15;
+    const projectId = 20;
+
+    const projectsWithStatuses = [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [],
+    }
+    ];
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+
+    try {
+      await service.createFeature(name, description, userId, projectId);
+    } catch (error) {
+      expect(error).toEqual(new UnauthorizedException('project not found'));
+      expect(projectsServices.getUserProjects).toHaveBeenCalled();
+      expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    }
+
+  });
+
+  it('updateFeature => should call the feature service update feature method and return the updated project', async() => {
+    const field = 'name';
+    const value = 'Feature 1 - updated';
+    const userId = 15;
+    const featureId = 3;
+
+    const projectId = 2;
+
+    const updatedProject = 
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [{
+        id: 3,
+        name: 'Feature 1 - updated',
+        description: 'F1 description',
+        userStoriesCount: 0,
+        completedUserStories: 0,
+        status: 'To Do',
+        userStories: [],
+      }],
+    };
+
+    featuresServices.updateFeature.mockResolvedValue(projectId);
+    projectsServices.getProjectById.mockResolvedValue(updatedProject);
+
+    const result = await service.updateFeature(field, value, userId, featureId);
+
+    expect(result).toEqual(updatedProject);
+    expect(featuresServices.updateFeature).toHaveBeenCalled();
+    expect(featuresServices.updateFeature).toHaveBeenCalledWith(
+      field,
+      value,
+      userId,
+      featureId,
+    );
+    expect(projectsServices.getProjectById).toHaveBeenCalled();
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+  });
+
+  it('deleteFeature => should return a delete feature and return updated project', async() => {
+    const featureId = 3;
+    const userId = 15;
+
+    const projectId = 1;
+
+    const projectWithStatuses = 
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    featuresServices.deleteFeature.mockResolvedValue(projectId);
+    projectsServices.getProjectById.mockResolvedValue(projectWithStatuses);
+
+    const result = await service.deleteFeature(featureId, userId);
+
+    expect(result).toEqual(projectWithStatuses);
+    expect(featuresServices.deleteFeature).toHaveBeenCalled();
+    expect(featuresServices.deleteFeature).toHaveBeenCalledWith(
+      featureId,
+      userId,
+    );
+    expect(projectsServices.getProjectById).toHaveBeenCalled();
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+
+  });
+
+  it('createUserStory => should call the user story service to create a user story and return the updated project', async() => {
+    const name = 'User Story 3';
+    const description = 'us3 description';
+    const userId = 15;
+    const projectId = 1;
+    const featureId = 1;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [
+        {
+          id: 2,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 1,
+          completedUserStories: 0,
+          status: 'To Do',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 1,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    ];
+
+    const updatedProject =     {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+            {
+              id: 5,
+              name: 'User Story 5',
+              description: 'us5 description',
+              taskCount: 0,
+              completedTask: 0,
+              tasks: [],
+            },
+          ],
+        },
+      ],
+    };
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+    projectsServices.getProjectById.mockResolvedValue(updatedProject);    
+
+    const result = await service.createUserStory(
+      name,
+      description,
+      userId,
+      projectId,
+      featureId,
+    );
+    
+    expect(result).toEqual(updatedProject);
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    expect(userStoriesServices.createUserStory).toHaveBeenCalled();
+    expect(userStoriesServices.createUserStory).toHaveBeenCalledWith(
+      name,
+      description,
+      featureId,
+    );
+    expect(projectsServices.getProjectById).toHaveBeenCalled();
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+
+  });
+
+  it('createUserStory => should throw unauthorized error when feature is undefined', async() => {
+    const name = 'User Story 3';
+    const description = 'us3 description';
+    const userId = 15;
+    const projectId = 1;
+    const featureId = 100;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [
+        {
+          id: 2,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 1,
+          completedUserStories: 0,
+          status: 'To Do',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 1,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    ];
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+   
+
+    try {
+      await service.createUserStory(
+      name,
+      description,
+      userId,
+      projectId,
+      featureId,
+      );
+    } catch(error) {
+      expect(error).toEqual(new UnauthorizedException('Unauthorized'));
+      expect(projectsServices.getUserProjects).toHaveBeenCalled();
+      expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    };
+  
+  });
+
+  it('createUserStory => should throw unauthorized error when project is undefined', async() => {
+    const name = 'User Story 3';
+    const description = 'us3 description';
+    const userId = 15;
+    const projectId = 100;
+    const featureId = 1;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [
+        {
+          id: 2,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 1,
+          completedUserStories: 0,
+          status: 'To Do',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 1,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    ];
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+   
+    try {
+      await service.createUserStory(
+      name,
+      description,
+      userId,
+      projectId,
+      featureId,
+      );
+    } catch(error) {
+      expect(error).toEqual(new UnauthorizedException('Unauthorized'));
+      expect(projectsServices.getUserProjects).toHaveBeenCalled();
+      expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    };
+  
+  });
+
+  it('updateUserStory => should call the user story service update user story method and return the updated project', async () => {
+    const field = 'name';
+    const value = 'User Story 1 - updated';
+    const userId = 15;
+    const userStoryId = 1;
+    
+    const projectId = 2;
+    
+    const updatedProject = {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [{
+        id: 3,
+        name: 'Feature 1 - updated',
+        description: 'F1 description',
+        userStoriesCount: 0,
+        completedUserStories: 0,
+        status: 'To Do',
+        userStories: [{
+          id: 1,
+          name: 'User Story 1 - updated',
+          description: 'us1 description',
+          taskCount: 1,
+          completedTask: 0,
+          tasks: [{ id: 1, name: 'Task 1', status: 'To Do' }],
+        }],
+      }],
+    };
+  
+  
+    userStoriesServices.updateUserStory.mockResolvedValue(projectId);
+    projectsServices.getProjectById.mockResolvedValue(updatedProject);
+  
+    const result = await service.updateUserStory(field, value, userId, userStoryId);
+  
+    expect(result).toEqual(updatedProject);
+    expect(userStoriesServices.updateUserStory).toHaveBeenCalledWith(field, value, userId, userStoryId);
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+  });
+
+  it('deleteUserStory => should return a delete user story and return updated project', async() => {
+    const userStoryId = 3;
+    const userId = 15;
+
+    const projectId = 1;
+
+    const projectWithStatuses = 
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 2,
+              completedTask: 1,
+              tasks: [
+                {
+                  id: 3,
+                  name: 'Task 3',
+                  status: 'In Progress',
+                },
+                {
+                  id: 4,
+                  name: 'Task 4',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    userStoriesServices.deleteUserStory.mockResolvedValue(projectId);
+    projectsServices.getProjectById.mockResolvedValue(projectWithStatuses);
+      
+    const result = await service.deleteUserStory(userStoryId, userId);
+      
+    expect(result).toEqual(projectWithStatuses);
+    expect(userStoriesServices.deleteUserStory).toHaveBeenCalled();
+    expect(userStoriesServices.deleteUserStory).toHaveBeenCalledWith(
+      userStoryId,
+      userId,
+    );
+    expect(projectsServices.getProjectById).toHaveBeenCalled();
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+
+  });
+
+  it('createTask => should call the tasks service to create a task and return the updated project', async() => {
+    const name = 'Task 3';
+    const userId = 15;
+    const projectId = 1;
+    const featureId = 1;
+    const userStoryId = 1;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 0,
+              completedTask: 0,
+              tasks: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [],
+    }
+    ];
+
+    const updatedProject =    
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 0,
+              completedTask: 0,
+              tasks: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 3,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+                {
+                  id: 11,
+                  name: 'Task 11',
+                  status: 'To Do',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);
+    projectsServices.getProjectById.mockResolvedValue(updatedProject);    
+
+    const result = await service.createTask(
+      name,
+      userId,
+      projectId,
+      featureId,
+      userStoryId,
+    );
+    
+    expect(result).toEqual(updatedProject);
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    expect(projectsServices.getProjectById).toHaveBeenCalled();
+    expect(projectsServices.getProjectById).toHaveBeenCalledWith(projectId);
+
+  });
+
+  it('createTask => should throw unauthorized error when user story is undefined', async() => {
+    const name = 'Task 3';
+    const userId = 15;
+    const projectId = 1;
+    const featureId = 1;
+    const userStoryId = 1;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 0,
+              completedTask: 0,
+              tasks: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [],
+    }
+    ];
+
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);   
+
+    try {
+      await service.createTask(
+      name,
+      userId,
+      projectId,
+      featureId,
+      userStoryId,
+    )
+    } catch (error) {
+    expect(error).toEqual(new UnauthorizedException('Unauthorized'));
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    }
+
+  });
+
+  it('createTask => should throw unauthorized error when feature is undefined', async() => {
+    const name = 'Task 3';
+    const userId = 15;
+    const projectId = 1;
+    const featureId = 100;
+    const userStoryId = 1;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 0,
+              completedTask: 0,
+              tasks: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [],
+    }
+    ];
+
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);   
+
+    try {
+      await service.createTask(
+      name,
+      userId,
+      projectId,
+      featureId,
+      userStoryId,
+    )
+    } catch (error) {
+    expect(error).toEqual(new UnauthorizedException('Unauthorized'));
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    }
+
+  });
+
+  it('createTask => should throw unauthorized error when project is undefined', async() => {
+    const name = 'Task 3';
+    const userId = 15;
+    const projectId = 100;
+    const featureId = 1;
+    const userStoryId = 1;
+
+    const projectsWithStatuses = 
+    [
+    {
+      id: 1,
+      name: 'Project 1',
+      description: 'p1 description',
+      status: 'In Progress',
+      features: [
+        {
+          id: 1,
+          name: 'Feature 1',
+          description: 'f1 description',
+          userStoriesCount: 2,
+          completedUserStories: 0,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 1,
+              name: 'User Story 1',
+              description: 'us1 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 1,
+                  name: 'Task 1',
+                  status: 'To Do',
+                },
+                {
+                  id: 2,
+                  name: 'Task 2',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 2,
+              name: 'User Story 2',
+              description: 'us2 description',
+              taskCount: 0,
+              completedTask: 0,
+              tasks: [],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: 'Feature 2',
+          description: 'f2 description',
+          userStoriesCount: 2,
+          completedUserStories: 1,
+          status: 'In Progress',
+          userStories: [
+            {
+              id: 3,
+              name: 'User Story 3',
+              description: 'us3 description',
+              taskCount: 2,
+              completedTask: 0,
+              tasks: [
+                {
+                  id: 5,
+                  name: 'Task 5',
+                  status: 'To Do',
+                },
+                {
+                  id: 6,
+                  name: 'Task 6',
+                  status: 'In Progress',
+                },
+              ],
+            },
+            {
+              id: 4,
+              name: 'User Story 4',
+              description: 'us4 description',
+              taskCount: 2,
+              completedTask: 2,
+              tasks: [
+                {
+                  id: 7,
+                  name: 'Task 7',
+                  status: 'Done!',
+                },
+                {
+                  id: 8,
+                  name: 'Task 8',
+                  status: 'Done!',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Project 2',
+      description: 'p2 description',
+      status: 'To Do',
+      features: [],
+    }
+    ];
+
+
+    projectsServices.getUserProjects.mockResolvedValue(projectsWithStatuses);   
+
+    try {
+      await service.createTask(
+      name,
+      userId,
+      projectId,
+      featureId,
+      userStoryId,
+    )
+    } catch (error) {
+    expect(error).toEqual(new UnauthorizedException('Unauthorized'));
+    expect(projectsServices.getUserProjects).toHaveBeenCalled();
+    expect(projectsServices.getUserProjects).toHaveBeenCalledWith(userId);
+    }
+
+  });
+
+  it('updateTask=> should call the taskservice to update task field and return the updated user story status', async () => {
+    const field = 'name';
+    const value = 'Todo 1 -- Edited';
+    const userId = 15;
+    const taskId = 1;
+
+    const userStoryId = 1;
+
+    const updatedUserStoryStatus = '0/3';
+      tasksServices.updateTask.mockResolvedValue(userStoryId);
+      userStoriesServices.getUserStoryById.mockResolvedValue(
+      updatedUserStoryStatus,
+    );
+
+    const result = await service.updateTask(field, value, userId, taskId);
+
+    expect(result).toEqual(updatedUserStoryStatus);
+    expect(tasksServices.updateTask).toHaveBeenCalled();
+    expect(tasksServices.updateTask).toHaveBeenCalledWith(
+      field,
+      value,
+      userId,
+      taskId,
+    );
+    expect(userStoriesServices.getUserStoryById).toHaveBeenCalled();
+    expect(userStoriesServices.getUserStoryById).toHaveBeenCalledWith(
+      userStoryId,
+    );
+  });
+
+  it('deleteTask => should delete a task and return the user story status plus updated task list', async () => {
+    const taskId = 3;
+    const userId = 15;
+
+    const userStoryId = 1;
+    const storyStatus = '2/2';
+    const updatedUserStory = {
+      id: 1,
+      name: 'User Story 4',
+      description: 'us4 description',
+      tasks: [
+        { id: 1, name: 'Task 7', status: 'Done!' },
+        { id: 2, name: 'Task 8', status: 'Done!' },
+      ],
+    } as UserStory;
+
+    const expected = {
+      storyStatus,
+      taskList: updatedUserStory.tasks,
+    };
+
+    // Correct mocks
+    jest.spyOn(tasksServices, 'deleteTask').mockResolvedValue(userStoryId);
+    jest.spyOn(userStoriesServices, 'getUserStoryById').mockResolvedValue(storyStatus);         // returns string
+    jest.spyOn(userStoriesServices, 'getUsersStoryById').mockResolvedValue(updatedUserStory);   // returns UserStory
+
+    const result = await service.deleteTask(taskId, userId);
+
+    expect(result).toEqual(expected);
+
+    expect(tasksServices.deleteTask).toHaveBeenCalled();
+    expect(tasksServices.deleteTask).toHaveBeenCalledWith(taskId, userId);
+
+    expect(userStoriesServices.getUserStoryById).toHaveBeenCalled();
+    expect(userStoriesServices.getUserStoryById).toHaveBeenCalledWith(userStoryId);
+
+    expect(userStoriesServices.getUsersStoryById).toHaveBeenCalled();
+    expect(userStoriesServices.getUsersStoryById).toHaveBeenCalledWith(userStoryId);
   });
 
 });
