@@ -15,7 +15,7 @@ Built using React, NestJS, and PostgreSQL, it mimics Trello-like behavior and in
   - Navigate to individual project pages
 
 - 🧩 **Frontend**:
-  - React + Chakra UI for responsive design
+  - React for inline text editing
   - Accordion-based dynamic project creation form
   - Toast notifications for user feedback
 
