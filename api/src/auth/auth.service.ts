@@ -186,7 +186,7 @@ export class AuthService {
     return { message: 'Password reset email sent' };
   }
 
-  async saveNewPassword(newPassword: string, id: number, token: string) {
+  async saveNewPassword(newPassword: string, id: number, token: string): Promise<any> {
     const user = await this.usersServices.findUserById(id);
     if (!user) throw new BadRequestException('User not found');
 
@@ -314,7 +314,7 @@ export class AuthService {
       value: string, 
       userId: number,
       taskId: number,
-    ) {
+    ): Promise<any> {
       const userStoryId =  await this.tasksService.updateTask(field, value,userId, taskId);
       return await this.userStoriesService.getUserStoryById(userStoryId);
     
